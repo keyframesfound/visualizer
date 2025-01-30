@@ -23,6 +23,11 @@ body {
     background-color: rgba(255, 255, 0, 0.5);
 }
 
+.light {
+    display: inline-block;
+    background-color: white;
+}
+
 #spotlight1 { top: 50px; left: 50px; }
 #spotlight2 { top: 50px; left: 200px; }
 #spotlight3 { top: 50px; left: 350px; }
