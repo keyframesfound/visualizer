@@ -1,0 +1,33 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #333;
+}
+
+#stage {
+    position: relative;
+    width: 800px;
+    height: 400px;
+    background-color: #444;
+    border: 2px solid #fff;
+}
+
+.spotlight {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 0, 0.5);
+}
+
+#spotlight1 { top: 50px; left: 50px; }
+#spotlight2 { top: 50px; left: 200px; }
+#spotlight3 { top: 50px; left: 350px; }
+#spotlight4 { top: 50px; left: 500px; }
+#spotlight5 { top: 50px; left: 500px; } /* Overlapping with spotlight4 */
+#spotlight6 { top: 50px; left: 650px; }
+#spotlight7 { top: 200px; left: 200px; }
+#spotlight8 { top: 200px; left: 500px; }
