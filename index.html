@@ -234,6 +234,23 @@
             padding: 20px 0;
         }
 
+        /* Add styles for the number input */
+        .brightness-input {
+            width: 40px;
+            padding: 2px 4px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            background: #333;
+            color: white;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+
+        .brightness-input::-webkit-inner-spin-button {
+            opacity: 1;
+        }
+
         .slider-container input[type="range"] {
             position: absolute;
             -webkit-appearance: none;
@@ -245,6 +262,8 @@
             left: -45px;  /* Centers the slider horizontally */
             top: 75px;   /* Centers the slider vertically */
             transition: all 0.5s ease;  /* Add transition for smoother slider movement */
+            min-width: 150px;
+            step: 1;
         }
 
         .slider-label {
@@ -363,36 +382,44 @@
         </div>
         <div class="slider-panel">
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">8</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="1">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="1">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">7</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="2">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="2">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">6</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="3">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="3">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">5</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="4">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="4">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">4</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="5">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="5">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">3</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="6">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="6">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">2</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="7">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="7">
             </div>
             <div class="slider-container">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">1</span>
-                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="8">
+                <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="8">
             </div>
         </div>
     </div>
@@ -407,10 +434,30 @@
         });
 
         sliders.forEach(slider => {
+            const container = slider.parentElement;
+            const numberInput = container.querySelector('.brightness-input');
+            
+            // Update number input when slider changes
             slider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                numberInput.value = value;
                 const spotlightNum = e.target.dataset.spotlight;
                 const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
-                const opacity = e.target.value / 100;
+                const opacity = value / 10; // Now divide by 10 since range is 1-10
+                spotlight.style.opacity = opacity;
+            });
+
+            // Update slider when number input changes
+            numberInput.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                // Clamp value between 1 and 10
+                value = Math.min(10, Math.max(1, value));
+                e.target.value = value;
+                slider.value = value;
+                
+                const spotlightNum = slider.dataset.spotlight;
+                const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
+                const opacity = value / 10;
                 spotlight.style.opacity = opacity;
             });
         });
@@ -538,6 +585,14 @@
         
         // ...rest of existing code...
 
+        function getSceneData() {
+            const sceneData = {};
+            sliders.forEach(slider => {
+                sceneData[slider.dataset.spotlight] = parseInt(slider.value);
+            });
+            return sceneData;
+        }
+
         function createScene() {
             const sceneName = prompt('Enter scene name:');
             if (!sceneName) return;
@@ -546,12 +601,7 @@
                 return;
             }
 
-            const sceneData = {};
-            sliders.forEach(slider => {
-                sceneData[slider.dataset.spotlight] = slider.value;
-            });
-
-            scenes[sceneName] = sceneData;
+            scenes[sceneName] = getSceneData();
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = sceneName;
             updateScenesList();
@@ -559,48 +609,9 @@
 
         function saveScene() {
             if (!currentScene) return;
-
-            const sceneData = {};
-            sliders.forEach(slider => {
-                sceneData[slider.dataset.spotlight] = slider.value;
-            });
-
-            scenes[currentScene] = sceneData;
+            scenes[currentScene] = getSceneData();
             localStorage.setItem('scenes', JSON.stringify(scenes));
             alert('Scene saved successfully');
-        }
-
-        function animateSlider(slider, targetValue) {
-            return new Promise(resolve => {
-                const startValue = parseInt(slider.value);
-                const startTime = performance.now();
-                const duration = 500; // Animation duration in milliseconds
-
-                function updateValue(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    // Easing function for smooth animation
-                    const easeProgress = progress < .5 ? 
-                        4 * progress * progress * progress : 
-                        1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-                    const currentValue = startValue + (targetValue - startValue) * easeProgress;
-                    slider.value = currentValue;
-                    
-                    // Trigger the input event to update spotlight opacity
-                    const event = new Event('input');
-                    slider.dispatchEvent(event);
-
-                    if (progress < 1) {
-                        requestAnimationFrame(updateValue);
-                    } else {
-                        resolve();
-                    }
-                }
-
-                requestAnimationFrame(updateValue);
-            });
         }
 
         async function loadScene(sceneName) {
@@ -608,14 +619,16 @@
             const animationPromises = [];
 
             sliders.forEach(slider => {
-                const targetValue = sceneData[slider.dataset.spotlight] || 100;
-                const promise = animateSlider(slider, targetValue);
+                const container = slider.parentElement;
+                const numberInput = container.querySelector('.brightness-input');
+                const targetValue = sceneData[slider.dataset.spotlight] || 10;
+                const promise = animateSlider(slider, targetValue).then(() => {
+                    numberInput.value = targetValue;
+                });
                 animationPromises.push(promise);
             });
 
-            // Wait for all animations to complete
             await Promise.all(animationPromises);
-            
             currentScene = sceneName;
             updateScenesList();
         }
