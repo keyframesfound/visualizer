@@ -264,6 +264,12 @@
             border-radius: 50%;
             cursor: pointer;
         }
+
+        .scene-button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -294,7 +300,10 @@
                 <!-- Scenes will be added here dynamically -->
             </div>
             <div class="scene-controls">
-                <button class="scene-button" id="saveScene">Save Scene</button>
+                <button class="scene-button" id="createScene">Create</button>
+                <button class="scene-button" id="saveScene" disabled>Save</button>
+                <button class="scene-button" id="renameScene">Rename</button>
+                <button class="scene-button" id="deleteScene">Delete</button>
             </div>
         </div>
         <div class="slider-panel">
@@ -353,13 +362,18 @@
 
         // Scene Management
         const sceneList = document.getElementById('sceneList');
+        const createSceneBtn = document.getElementById('createScene');
         const saveSceneBtn = document.getElementById('saveScene');
+        const renameSceneBtn = document.getElementById('renameScene');
+        const deleteSceneBtn = document.getElementById('deleteScene');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
         let currentScene = null;
 
         function updateScenesList() {
             sceneList.innerHTML = '';
+            saveSceneBtn.disabled = !currentScene; // Disable save button if no scene selected
+            
             Object.keys(scenes).forEach(sceneName => {
                 const sceneDiv = document.createElement('div');
                 sceneDiv.className = 'scene-item';
@@ -372,9 +386,13 @@
             });
         }
 
-        function saveScene() {
+        function createScene() {
             const sceneName = prompt('Enter scene name:');
             if (!sceneName) return;
+            if (scenes[sceneName]) {
+                alert('A scene with this name already exists');
+                return;
+            }
 
             const sceneData = {};
             sliders.forEach(slider => {
@@ -384,6 +402,47 @@
             scenes[sceneName] = sceneData;
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = sceneName;
+            updateScenesList();
+        }
+
+        function saveScene() {
+            if (!currentScene) return;
+
+            const sceneData = {};
+            sliders.forEach(slider => {
+                sceneData[slider.dataset.spotlight] = slider.value;
+            });
+
+            scenes[currentScene] = sceneData;
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            alert('Scene saved successfully');
+        }
+
+        function deleteScene() {
+            if (!currentScene) {
+                alert('Please select a scene first');
+                return;
+            }
+            if (confirm(`Are you sure you want to delete scene "${currentScene}"?`)) {
+                delete scenes[currentScene];
+                localStorage.setItem('scenes', JSON.stringify(scenes));
+                currentScene = null;
+                updateScenesList();
+            }
+        }
+
+        function renameScene() {
+            if (!currentScene) {
+                alert('Please select a scene first');
+                return;
+            }
+            const newName = prompt('Enter new scene name:', currentScene);
+            if (!newName || newName === currentScene) return;
+            
+            scenes[newName] = scenes[currentScene];
+            delete scenes[currentScene];
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            currentScene = newName;
             updateScenesList();
         }
 
@@ -437,7 +496,10 @@
             updateScenesList();
         }
 
+        createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
+        deleteSceneBtn.onclick = deleteScene;
+        renameSceneBtn.onclick = renameScene;
 
         // Initial render
         updateScenesList();
