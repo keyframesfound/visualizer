@@ -98,27 +98,58 @@ body {
     background: #555;
 }
 
+.control-panel {
+    position: fixed;
+    bottom: -300px;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: bottom 0.2s ease;
+    display: grid;
+    grid-template-columns: 400px 1fr; /* Increased from 200px to accommodate 2 columns */
+    gap: 20px;
+    z-index: 997;
+}
+
 .scene-manager {
     border-right: 1px solid #444;
     padding-right: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 380px; /* Add minimum width to ensure proper layout */
     width: 300px;
     height: 100%; /* Take full height of control panel */
 }
 
 .scene-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Create 2 equal columns */
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     padding: 10px;
-    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 180px;
+    overflow-y: auto;
     overflow-x: hidden;
-    max-height: 180px; /* Set a fixed height to enable scrolling */
     align-content: start; /* Ensure grid items start from the top */
+}
+
+.scene-item {
+    padding: 8px;
+    background: #444;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    min-width: 0;
+    margin: 0; /* Remove any margins that might affect the grid */
 }
 
 /* Custom scrollbar styling */
