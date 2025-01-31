@@ -1,20 +1,19 @@
-let audioContext;
-let audioBuffer;
-let audioSource;
-let isPlaying = false;
-let startTime;
-let playhead;
-let timeDisplay;
-let animationFrame;
-const pixelsPerSecond = 100; // 100px = 1 second
-
 document.addEventListener('DOMContentLoaded', () => {
     const playPauseBtn = document.getElementById('playPauseBtn');
     const stopBtn = document.getElementById('stopBtn');
     const audioUpload = document.getElementById('audioUpload');
     const timelineClips = document.querySelector('.timeline-clips');
-    playhead = document.querySelector('.playhead');
-    timeDisplay = document.querySelector('.time-display');
+
+    // Remove timeline-related elements
+    const timelineViewBtn = document.getElementById('timelineViewBtn');
+    if (timelineViewBtn) {
+        timelineViewBtn.remove();
+    }
+
+    const timelinePage = document.querySelector('.timeline-page');
+    if (timelinePage) {
+        timelinePage.remove();
+    }
 
     // Initialize Web Audio API
     try {
@@ -45,8 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const arrayBuffer = await file.arrayBuffer();
         audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
         
-        // Draw waveform
-        drawWaveform(audioBuffer);
+        // Clear existing waveforms
+        clearWaveforms();
+        // Create new waveform visualization
+        createWaveformVisualization(audioBuffer);
         
         // Update timeline width based on audio duration
         timelineClips.style.width = `${audioBuffer.duration * pixelsPerSecond}px`;
@@ -95,90 +96,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const clip = createClip(sceneName, e.offsetX);
         timelineClips.appendChild(clip);
     });
+
+    // Create timeline page if it doesn't exist
+    let timelinePage = document.querySelector('.timeline-page');
+    if (!timelinePage) {
+        timelinePage = document.createElement('div');
+        timelinePage.className = 'timeline-page';
+        timelinePage.innerHTML = `
+            <div class="timeline-header">
+                <button class="close-timeline">Close</button>
+            </div>
+            <div class="timeline-content">
+                <div class="waveform-container"></div>
+                <div class="timeline-tracks"></div>
+            </div>
+        `;
+        document.body.appendChild(timelinePage);
+    }
+
+    // Add click handlers for timeline view
+    timelineViewBtn.addEventListener('click', () => {
+        timelinePage.classList.add('active');
+    });
+
+    document.querySelector('.close-timeline').addEventListener('click', () => {
+        timelinePage.classList.remove('active');
+    });
 });
 
-function startPlayback() {
-    if (!audioBuffer) return;
-    
-    audioSource = audioContext.createBufferSource();
-    audioSource.buffer = audioBuffer;
-    audioSource.connect(audioContext.destination);
-    
-    const playheadPosition = parseInt(playhead.style.left) || 0;
-    const startOffset = playheadPosition / pixelsPerSecond;
-    
-    audioSource.start(0, startOffset);
-    startTime = audioContext.currentTime - startOffset;
-    isPlaying = true;
-    
-    document.getElementById('playPauseBtn').textContent = 'Pause';
-    updatePlayhead();
-}
-
-function pausePlayback() {
-    if (!audioSource) return;
-    
-    audioSource.stop();
-    isPlaying = false;
-    document.getElementById('playPauseBtn').textContent = 'Play';
-    cancelAnimationFrame(animationFrame);
-}
-
-function stopPlayback() {
-    pausePlayback();
-    playhead.style.left = '0px';
-    timeDisplay.textContent = '00:00.000';
-}
-
-function updatePlayhead() {
-    if (!isPlaying) return;
-    
-    const currentTime = audioContext.currentTime - startTime;
-    const position = currentTime * pixelsPerSecond;
-    
-    playhead.style.left = `${position}px`;
-    timeDisplay.textContent = formatTime(currentTime);
-    
-    // Execute scenes based on playhead position
-    executeSceneAtPosition(position);
-    
-    if (currentTime < audioBuffer.duration) {
-        animationFrame = requestAnimationFrame(updatePlayhead);
-    } else {
-        stopPlayback();
-    }
-}
-
-function formatTime(seconds) {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 1000);
-    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
-}
-
-function drawWaveform(audioBuffer) {
-    const canvas = document.querySelector('.waveform');
-    const ctx = canvas.getContext('2d');
-    const data = audioBuffer.getChannelData(0);
-    const step = Math.ceil(data.length / canvas.width);
-    const amp = canvas.height / 2;
-
-    ctx.fillStyle = 'white';
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for(let i = 0; i < canvas.width; i++) {
-        let min = 1.0;
-        let max = -1.0;
-        
-        for (let j = 0; j < step; j++) {
-            const datum = data[(i * step) + j];
-            if (datum < min) min = datum;
-            if (datum > max) max = datum;
-        }
-        
-        ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
-    }
-}
+// Remove these functions
+// - clearWaveforms
+// - createWaveformVisualization
+// - drawWaveform
+// - toggleTimelineView
+// - startPlayback
+// - pausePlayback
+// - stopPlayback
+// - updatePlayhead
+// - formatTime
 
 function createClip(sceneName, position) {
     const clip = document.createElement('div');

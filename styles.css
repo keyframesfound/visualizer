@@ -66,3 +66,76 @@ body {
 #spotlight6 { top: 50px; left: 650px; }
 #spotlight7 { top: 200px; left: 200px; }
 #spotlight8 { top: 200px; left: 500px; }
+
+/* Remove these classes */
+.timeline-container,
+.timeline-container.timeline-view,
+.waveform-container,
+.waveform,
+#timelineViewBtn,
+.timeline-page,
+.timeline-page.active {
+    display: none;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#timelineViewBtn, .export-pdf-button {
+    padding: 8px 16px;
+    background: #444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#timelineViewBtn:hover, .export-pdf-button:hover {
+    background: #555;
+}
+
+.scene-manager {
+    border-right: 1px solid #444;
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+    height: 100%; /* Take full height of control panel */
+}
+
+.scene-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Create 2 equal columns */
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden;
+    max-height: 180px; /* Set a fixed height to enable scrolling */
+    align-content: start; /* Ensure grid items start from the top */
+}
+
+/* Custom scrollbar styling */
+.scene-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scene-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.scene-list::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+
+.scene-list::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
