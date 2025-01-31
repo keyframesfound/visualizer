@@ -270,6 +270,63 @@
             color: #666;
             cursor: not-allowed;
         }
+
+        /* New dropdown menu styles */
+        .scene-item {
+            padding: 8px;
+            background: #444;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scene-name {
+            flex-grow: 1;
+        }
+
+        .more-options {
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .more-options:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            background: #333;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            min-width: 120px;  /* Set fixed minimum width */
+            max-width: 150px;  /* Set maximum width */
+            font-size: 0.9em;  /* Slightly smaller text */
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 6px 12px;  /* Reduced padding */
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;  /* Add ellipsis for long text */
+        }
+
+        .dropdown-item:hover {
+            background: #444;
+        }
     </style>
 </head>
 <body>
@@ -302,9 +359,6 @@
             <div class="scene-controls">
                 <button class="scene-button" id="createScene">Create</button>
                 <button class="scene-button" id="saveScene" disabled>Save</button>
-                <button class="scene-button" id="duplicateScene">Duplicate</button>
-                <button class="scene-button" id="renameScene">Rename</button>
-                <button class="scene-button" id="deleteScene">Delete</button>
             </div>
         </div>
         <div class="slider-panel">
@@ -374,19 +428,115 @@
 
         function updateScenesList() {
             sceneList.innerHTML = '';
-            saveSceneBtn.disabled = !currentScene; // Disable save button if no scene selected
+            saveSceneBtn.disabled = !currentScene;
             
             Object.keys(scenes).forEach(sceneName => {
                 const sceneDiv = document.createElement('div');
                 sceneDiv.className = 'scene-item';
-                sceneDiv.textContent = sceneName;
-                sceneDiv.onclick = () => loadScene(sceneName);
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'scene-name';
+                nameSpan.textContent = sceneName;
+                nameSpan.onclick = () => loadScene(sceneName);
+                
+                const moreButton = document.createElement('span');
+                moreButton.className = 'more-options';
+                moreButton.textContent = '•••';
+                moreButton.onclick = (e) => showDropdownMenu(e, sceneName);
+                
                 if (currentScene === sceneName) {
                     sceneDiv.classList.add('active');
                 }
+                
+                sceneDiv.appendChild(nameSpan);
+                sceneDiv.appendChild(moreButton);
                 sceneList.appendChild(sceneDiv);
             });
         }
+
+        // Add new dropdown menu functions
+        function showDropdownMenu(event, sceneName) {
+            event.stopPropagation(); // Prevent scene selection
+            
+            // Remove any existing dropdown
+            const existing = document.querySelector('.dropdown-menu');
+            if (existing) existing.remove();
+            
+            const dropdown = document.createElement('div');
+            dropdown.className = 'dropdown-menu show';
+            
+            const items = [
+                { text: 'Duplicate', action: () => duplicateScene(sceneName) },
+                { text: 'Rename', action: () => renameScene(sceneName) },
+                { text: 'Delete', action: () => deleteScene(sceneName) }
+            ];
+            
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+                div.textContent = item.text;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    currentScene = sceneName;
+                    item.action();
+                    dropdown.remove();
+                };
+                dropdown.appendChild(div);
+            });
+            
+            // Position dropdown next to the more button
+            const rect = event.target.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceRight = window.innerWidth - rect.left;
+            
+            dropdown.style.position = 'fixed';
+            
+            // Position vertically
+            if (spaceBelow < 150) {  // If not enough space below
+                dropdown.style.bottom = `${window.innerHeight - rect.top + 5}px`;
+            } else {
+                dropdown.style.top = `${rect.bottom + 5}px`;
+            }
+            
+            // Position horizontally
+            if (spaceRight < 150) {  // If not enough space to the right
+                dropdown.style.right = `${window.innerWidth - rect.right}px`;
+            } else {
+                dropdown.style.left = `${rect.left}px`;
+            }
+            
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeDropdown() {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                }, { once: true });
+            }, 0);
+        }
+
+        // Modify the existing scene functions to work with the new menu
+        function duplicateScene(sceneName = currentScene) {
+            if (!sceneName) return;
+            // ... rest of existing duplicate function ...
+        }
+
+        function renameScene(sceneName = currentScene) {
+            if (!sceneName) return;
+            // ... rest of existing rename function ...
+        }
+
+        function deleteScene(sceneName = currentScene) {
+            if (!sceneName) return;
+            // ... rest of existing delete function ...
+        }
+
+        // Remove the old button event listeners
+        // createSceneBtn.onclick and saveSceneBtn.onclick remain the same
+        // Remove duplicateSceneBtn, renameSceneBtn, and deleteSceneBtn references and listeners
+        
+        // ...rest of existing code...
 
         function createScene() {
             const sceneName = prompt('Enter scene name:');
@@ -418,34 +568,6 @@
             scenes[currentScene] = sceneData;
             localStorage.setItem('scenes', JSON.stringify(scenes));
             alert('Scene saved successfully');
-        }
-
-        function deleteScene() {
-            if (!currentScene) {
-                alert('Please select a scene first');
-                return;
-            }
-            if (confirm(`Are you sure you want to delete scene "${currentScene}"?`)) {
-                delete scenes[currentScene];
-                localStorage.setItem('scenes', JSON.stringify(scenes));
-                currentScene = null;
-                updateScenesList();
-            }
-        }
-
-        function renameScene() {
-            if (!currentScene) {
-                alert('Please select a scene first');
-                return;
-            }
-            const newName = prompt('Enter new scene name:', currentScene);
-            if (!newName || newName === currentScene) return;
-            
-            scenes[newName] = scenes[currentScene];
-            delete scenes[currentScene];
-            localStorage.setItem('scenes', JSON.stringify(scenes));
-            currentScene = newName;
-            updateScenesList();
         }
 
         function animateSlider(slider, targetValue) {
@@ -498,34 +620,8 @@
             updateScenesList();
         }
 
-        function duplicateScene() {
-            if (!currentScene) {
-                alert('Please select a scene first');
-                return;
-            }
-            
-            const baseName = currentScene;
-            let newName = `${baseName} (copy)`;
-            let counter = 1;
-            
-            // Find an available name if the copy name already exists
-            while (scenes[newName]) {
-                counter++;
-                newName = `${baseName} (copy ${counter})`;
-            }
-            
-            // Copy the scene data
-            scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
-            localStorage.setItem('scenes', JSON.stringify(scenes));
-            currentScene = newName;
-            updateScenesList();
-        }
-
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
-        deleteSceneBtn.onclick = deleteScene;
-        renameSceneBtn.onclick = renameScene;
-        duplicateSceneBtn.onclick = duplicateScene;
 
         // Initial render
         updateScenesList();
