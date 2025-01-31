@@ -19,10 +19,9 @@
             position: relative;
             width: 1200px;
             height: 600px;
-            margin-top: 100px; /* Add margin to prevent overlap with timeline */
+            margin-top: 100px;
         }
 
-        /* Stage Floor */
         .stage-floor {
             position: absolute;
             bottom: 50px;
@@ -36,7 +35,6 @@
             padding: 0 20px;
         }
 
-        /* Spotlight Locations */
         .spotlight-location {
             width: 180px;
             height: 180px;
@@ -62,22 +60,15 @@
             z-index: 1;
         }
 
-        /* Overlap for spotlights 4 and 5 */
         #spotlight-4 {
-            margin-right: -80px; /* Significant overlap */
-            z-index: 2; /* Place above spotlight 5 */
+            margin-right: -80px;
+            z-index: 2;
         }
 
         #spotlight-5 {
-            margin-left: -80px; /* Significant overlap */
+            margin-left: -80px;
         }
 
-        /* Other spotlights shouldn't overlap */
-        #spotlight-1, #spotlight-2, #spotlight-3, #spotlight-6, #spotlight-7, #spotlight-8 {
-            margin: 0 -5px;
-        }
-
-        /* Stage Labels */
         .stage-label {
             position: absolute;
             color: white;
@@ -98,40 +89,28 @@
             transform: translateY(50%);
         }
 
-        /* Glass Wall */
         .glass-wall {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 200px;
-            background: linear-gradient(45deg, 
-                rgba(255,255,255,0.1) 0%,
-                rgba(255,255,255,0.3) 50%,
-                rgba(255,255,255,0.1) 100%);
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%);
             backdrop-filter: blur(5px);
             border-bottom: 2px solid rgba(255,255,255,0.2);
         }
 
-        /* Textured Wall */
         .textured-wall {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 50px;
-            background: repeating-linear-gradient(
-                45deg,
-                #444,
-                #444 10px,
-                #555 10px,
-                #555 20px
-            );
+            background: repeating-linear-gradient(45deg, #444, #444 10px, #555 10px, #555 20px);
         }
 
-        /* Control Panel Styles */
         .control-panel-button {
             position: fixed;
-            bottom: 20px;  /* Moved closer to bottom */
+            bottom: 20px;
             right: 20px;
             padding: 10px 20px;
             background: #444;
@@ -144,10 +123,10 @@
 
         .control-panel {
             position: fixed;
-            bottom: -300px;  /* Increased from -200px */
+            bottom: -300px;
             left: 0;
             width: 100%;
-            height: 300px; /* Increased from 200px */
+            height: 300px;
             background: rgba(0, 0, 0, 0.9);
             padding: 20px;
             box-sizing: border-box;
@@ -155,11 +134,11 @@
             display: grid;
             grid-template-columns: 200px 1fr;
             gap: 20px;
-            z-index: 997; /* Ensure it's below timeline */
+            z-index: 997;
         }
 
         .control-panel.open {
-            bottom: 0;  /* Changed to sit at bottom */
+            bottom: 0;
         }
 
         .scene-manager {
@@ -229,13 +208,12 @@
             align-items: center;
             justify-content: space-between;
             width: 60px;
-            height: 180px; /* Increased height to accommodate bottom input */
+            height: 180px;
             position: relative;
             margin: 0 15px;
             padding: 20px 0;
         }
 
-        /* Add styles for the number input */
         .brightness-input {
             width: 40px;
             padding: 2px 4px;
@@ -263,22 +241,21 @@
             background: #555;
             transform: rotate(270deg);
             transform-origin: center;
-            left: -45px;  /* Centers the slider horizontally */
-            top: 75px;   /* Centers the slider vertically */
-            transition: all 0.5s ease;  /* Add transition for smoother slider movement */
+            left: -45px;
+            top: 75px;
+            transition: all 0.5s ease;
             min-width: 150px;
             step: 1;
         }
 
         .slider-label {
             position: absolute;
-            bottom: 30px; /* Moved up to make room for input */
+            bottom: 30px;
             color: white;
             text-align: center;
             width: 100%;
         }
 
-        /* Add styling for range input thumb */
         .slider-container input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 15px;
@@ -292,23 +269,6 @@
             background: #333;
             color: #666;
             cursor: not-allowed;
-        }
-
-        /* New dropdown menu styles */
-        .scene-item {
-            padding: 8px;
-            background: #444;
-            border-radius: 4px;
-            margin-bottom: 5px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .scene-name {
-            flex-grow: 1;
         }
 
         .more-options {
@@ -329,9 +289,9 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             display: none;
             z-index: 1000;
-            min-width: 120px;  /* Set fixed minimum width */
-            max-width: 150px;  /* Set maximum width */
-            font-size: 0.9em;  /* Slightly smaller text */
+            min-width: 120px;
+            max-width: 150px;
+            font-size: 0.9em;
         }
 
         .dropdown-menu.show {
@@ -339,22 +299,21 @@
         }
 
         .dropdown-item {
-            padding: 6px 12px;  /* Reduced padding */
+            padding: 6px 12px;
             color: white;
             cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis;  /* Add ellipsis for long text */
+            text-overflow: ellipsis;
         }
 
         .dropdown-item:hover {
             background: #444;
         }
 
-        /* Timeline styles */
         .timeline-container {
             position: fixed;
-            top: 0;  /* Changed from bottom */
+            top: 0;
             left: 0;
             width: 100%;
             height: 100px;
@@ -555,38 +514,31 @@
             const container = slider.parentElement;
             const numberInput = container.querySelector('.brightness-input');
             
-            // Update number input when slider changes
             slider.addEventListener('input', (e) => {
                 const value = e.target.value;
                 numberInput.value = value;
-                const spotlightNum = e.target.dataset.spotlight;
-                const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
-                const opacity = value / 10; // Now divide by 10 since range is 1-10
-                spotlight.style.opacity = opacity;
+                updateSpotlightOpacity(slider, value);
             });
 
-            // Update slider when number input changes
             numberInput.addEventListener('input', (e) => {
                 let value = parseInt(e.target.value);
-                // Clamp value between 0 and 10
                 value = Math.min(10, Math.max(0, value));
                 e.target.value = value;
                 slider.value = value;
-                
-                const spotlightNum = slider.dataset.spotlight;
-                const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
-                const opacity = value / 10;
-                spotlight.style.opacity = opacity;
+                updateSpotlightOpacity(slider, value);
             });
         });
 
-        // Scene Management
+        function updateSpotlightOpacity(slider, value) {
+            const spotlightNum = slider.dataset.spotlight;
+            const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
+            const opacity = value / 10;
+            spotlight.style.opacity = opacity;
+        }
+
         const sceneList = document.getElementById('sceneList');
         const createSceneBtn = document.getElementById('createScene');
         const saveSceneBtn = document.getElementById('saveScene');
-        const renameSceneBtn = document.getElementById('renameScene');
-        const deleteSceneBtn = document.getElementById('deleteScene');
-        const duplicateSceneBtn = document.getElementById('duplicateScene');
         const exportScenesBtn = document.getElementById('exportScenes');
         const importScenesBtn = document.getElementById('importScenes');
         const importFile = document.getElementById('importFile');
@@ -605,7 +557,6 @@
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'scene-name';
                 nameSpan.textContent = sceneName;
-                // Remove the onclick from nameSpan and add it to sceneDiv
                 
                 const moreButton = document.createElement('span');
                 moreButton.className = 'more-options';
@@ -621,7 +572,7 @@
                 
                 sceneDiv.appendChild(nameSpan);
                 sceneDiv.appendChild(moreButton);
-                sceneDiv.onclick = () => loadScene(sceneName); // Move click handler here
+                sceneDiv.onclick = () => loadScene(sceneName);
                 sceneList.appendChild(sceneDiv);
             });
         }
@@ -654,22 +605,19 @@
                 dropdown.appendChild(div);
             });
 
-            // Position dropdown next to the more button
             const rect = event.target.getBoundingClientRect();
             const spaceBelow = window.innerHeight - rect.bottom;
             const spaceRight = window.innerWidth - rect.left;
             
             dropdown.style.position = 'fixed';
             
-            // Position vertically
-            if (spaceBelow < 150) {  // If not enough space below
+            if (spaceBelow < 150) {
                 dropdown.style.bottom = `${window.innerHeight - rect.top + 5}px`;
             } else {
                 dropdown.style.top = `${rect.bottom + 5}px`;
             }
             
-            // Position horizontally
-            if (spaceRight < 150) {  // If not enough space to the right
+            if (spaceRight < 150) {
                 dropdown.style.right = `${window.innerWidth - rect.right}px`;
             } else {
                 dropdown.style.left = `${rect.left}px`;
@@ -677,7 +625,6 @@
             
             document.body.appendChild(dropdown);
             
-            // Close dropdown when clicking outside
             setTimeout(() => {
                 document.addEventListener('click', function closeDropdown() {
                     dropdown.remove();
@@ -686,7 +633,6 @@
             }, 0);
         }
 
-        // Modify the existing scene functions to work with the new menu
         function duplicateScene(sceneName = currentScene) {
             if (!sceneName) return;
             
@@ -694,13 +640,11 @@
             let newName = `${baseName} (copy)`;
             let counter = 1;
             
-            // Find an available name if the copy name already exists
             while (scenes[newName]) {
                 counter++;
                 newName = `${baseName} (copy ${counter})`;
             }
             
-            // Deep copy the scene data
             scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = newName;
@@ -770,13 +714,12 @@
             return new Promise(resolve => {
                 const startValue = parseInt(slider.value);
                 const startTime = performance.now();
-                const duration = 500; // Animation duration in milliseconds
+                const duration = 500;
 
                 function updateValue(currentTime) {
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     
-                    // Easing function for smooth animation
                     const easeProgress = progress < .5 ? 
                         4 * progress * progress * progress : 
                         1 - Math.pow(-2 * progress + 2, 3) / 2;
@@ -784,13 +727,11 @@
                     const currentValue = Math.round(startValue + (targetValue - startValue) * easeProgress);
                     slider.value = currentValue;
                     
-                    // Update both the slider and spotlight opacity
                     const spotlightNum = slider.dataset.spotlight;
                     const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
                     const opacity = currentValue / 10;
                     spotlight.style.opacity = opacity;
 
-                    // Also update the number input
                     const container = slider.parentElement;
                     const numberInput = container.querySelector('.brightness-input');
                     numberInput.value = currentValue;
@@ -814,7 +755,6 @@
 
             sliders.forEach(slider => {
                 const spotlightNum = slider.dataset.spotlight;
-                // Make sure we get a value between 0-10
                 const targetValue = Math.min(10, Math.max(0, sceneData[spotlightNum] || 10));
                 const promise = animateSlider(slider, targetValue);
                 animationPromises.push(promise);
@@ -825,7 +765,6 @@
             updateScenesList();
         }
 
-        // Add export/import functions
         function exportScenes() {
             const scenesData = {
                 scenes: scenes,
@@ -866,7 +805,6 @@
                         return;
                     }
 
-                    // Validate all values are 0-10
                     for (const sceneName of sceneNames) {
                         const sceneData = importedScenes[sceneName];
                         for (const key in sceneData) {
@@ -893,10 +831,9 @@
                 }
             };
             reader.readAsText(file);
-            event.target.value = ''; // Reset file input
+            event.target.value = '';
         }
 
-        // Add event listeners for export/import
         exportScenesBtn.onclick = exportScenes;
         importScenesBtn.onclick = () => importFile.click();
         importFile.onchange = importScenes;
@@ -904,10 +841,8 @@
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
 
-        // Initial render
         updateScenesList();
 
-        // Timeline functionality
         const timelineGrid = document.getElementById('timelineGrid');
         const timelineCursor = document.getElementById('timelineCursor');
         const playButton = document.getElementById('playButton');
@@ -918,10 +853,9 @@
         let isPlaying = false;
         let currentTime = 0;
         let animationFrame;
-        const TIMELINE_DURATION = 300; // 5 minutes in seconds
-        const MARKS_INTERVAL = 5; // 5 seconds between marks
+        const TIMELINE_DURATION = 300;
+        const MARKS_INTERVAL = 5;
 
-        // Create timeline marks
         for (let i = 0; i <= TIMELINE_DURATION; i += MARKS_INTERVAL) {
             const mark = document.createElement('div');
             mark.className = 'timeline-mark';
@@ -991,24 +925,19 @@
             updateCursor(currentTime);
         });
 
-        // Initialize cursor position
         updateCursor(0);
 
-        // Modify the updateScenesList function to add scene markers to timeline
         const originalUpdateScenesList = updateScenesList;
         updateScenesList = function() {
             originalUpdateScenesList();
             
-            // Clear existing markers
             const existingMarkers = timelineTrack.querySelectorAll('.scene-marker');
             existingMarkers.forEach(marker => marker.remove());
 
-            // Add scene markers
             Object.keys(scenes).forEach((sceneName, index) => {
                 const marker = document.createElement('div');
                 marker.className = 'scene-marker';
                 marker.title = sceneName;
-                // Position markers evenly across timeline for now
                 const position = (index / (Object.keys(scenes).length - 1 || 1)) * 100;
                 marker.style.left = `${position}%`;
                 timelineTrack.appendChild(marker);
