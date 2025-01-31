@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stage Lighting Planner</title>
     <style>
         body {
@@ -17,9 +17,11 @@
 
         .stage-container {
             position: relative;
-            width: 1300px;  /* Only change: increased from 1200px */
-            height: 600px;
-            margin-top: -300px;
+            width: 90vw;  /* Changed from fixed width to viewport width */
+            max-width: 1300px;
+            height: 60vh;  /* Changed from fixed height to viewport height */
+            max-height: 600px;
+            margin-top: -20vh;  /* Adjusted for viewport height */
             perspective: 1000px;
         }
 
@@ -33,14 +35,14 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 0 20px;  /* Reverted back to original */
+            padding: 0 2vw;  /* Changed from fixed padding to viewport width */
             transform: perspective(1000px) rotateX(5deg);
             transform-origin: bottom;
         }
 
         .spotlight-location {
-            width: 180px;
-            height: 180px;
+            width: clamp(100px, 15vw, 180px);  /* Responsive width */
+            height: clamp(100px, 15vw, 180px);  /* Responsive height */
             background: rgba(255, 255, 255, 0.3);
             border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
@@ -341,15 +343,15 @@
         }
 
         .prop-item {
-            width: 60px;  /* Increased from 40px */
-            height: 60px;  /* Increased from 40px */
+            width: clamp(40px, 8vw, 60px);  /* Responsive width */
+            height: clamp(40px, 8vw, 60px);  /* Responsive height */
             background: white;
             border-radius: 8px;  /* Increased from 4px */
             cursor: move;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;  /* Increased from 24px */
+            font-size: clamp(24px, 4vw, 32px);  /* Responsive font size */
             color: white;
             display: flex;
             flex-direction: column;
@@ -430,6 +432,53 @@
 
         .export-pdf-button:hover {
             background: #555;
+        }
+
+        @media (max-width: 768px) {
+            .stage-label {
+                font-size: 1.2em;
+            }
+
+            .audience-label {
+                font-size: 1.2em;
+            }
+
+            .control-panel-button,
+            .export-pdf-button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .scene-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .stage-container {
+                width: 95vw;
+                height: 65vh;
+            }
+
+            .props-panel {
+                padding: 15px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 600px) {
+            .stage-container {
+                margin-top: -10vh;
+                height: 50vh;
+            }
+
+            .props-panel {
+                flex-direction: row;
+                top: auto;
+                bottom: 80px;
+                transform: none;
+                width: auto;
+            }
         }
     </style>
     
