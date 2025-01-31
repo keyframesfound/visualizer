@@ -79,9 +79,15 @@ body {
 }
 
 .control-buttons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 20px; /* Match padding-right of scene-manager */
     display: flex;
     gap: 10px;
-    margin-bottom: 10px;
+    padding: 10px 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1;
 }
 
 #timelineViewBtn, .export-pdf-button {
@@ -119,25 +125,52 @@ body {
     padding-right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-width: 380px; /* Add minimum width to ensure proper layout */
-    width: 300px;
-    height: 100%; /* Take full height of control panel */
+    min-width: 380px;
+    height: 100%;
+    position: relative;
 }
 
 .scene-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Optional: Add some space between scene items */
-}
-
-.spotlight-location {
+    margin-top: 60px; /* Space for header */
+    margin-bottom: 60px; /* Space for footer */
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
     padding: 10px;
-    background-color: #f9f9f9; /* Optional: Add background color to scene items */
-    border: 1px solid #ddd; /* Optional: Add border to scene items */
 }
 
-/* Custom scrollbar styling */
+.scene-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 20px; /* Match padding-right of scene-manager */
+    display: flex;
+    gap: 5px;
+    padding: 10px 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1;
+}
+
+.scene-item {
+    padding: 8px;
+    background: #444;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 20px; /* Minimum height for clickability */
+}
+
+/* Last scene item shouldn't have margin bottom */
+.scene-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Enhanced scrollbar styling */
 .scene-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -155,9 +188,26 @@ body {
 .scene-list::-webkit-scrollbar-thumb:hover {
     background: #666;
 }
+
 .scene-list-container {
     max-height: 300px; /* Adjust this value to control the height of the scrollable area */
     overflow-y: auto;  /* Enable vertical scrolling */
     border: 1px solid #ccc; /* Optional: Add a border for better visibility */
     padding: 10px; /* Optional: Add some padding */
+}
+
+/* Make buttons consistent size */
+.scene-button {
+    min-width: 70px; /* Ensure minimum width for buttons */
+    padding: 8px 12px;
+    background: #444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.export-pdf-button {
+    min-width: 120px; /* Ensure minimum width for export button */
 }
