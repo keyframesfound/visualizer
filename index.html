@@ -201,6 +201,8 @@
         .scene-controls {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            justify-content: flex-start;
         }
 
         .scene-button {
@@ -228,7 +230,7 @@
             align-items: center;
             justify-content: space-between;
             width: 60px;
-            height: 160px;
+            height: 180px; /* Increased height to accommodate bottom input */
             position: relative;
             margin: 0 15px;
             padding: 20px 0;
@@ -243,8 +245,11 @@
             background: #333;
             color: white;
             text-align: center;
-            margin-top: 5px;
             font-size: 0.9em;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .brightness-input::-webkit-inner-spin-button {
@@ -268,7 +273,7 @@
 
         .slider-label {
             position: absolute;
-            bottom: 10px;
+            bottom: 30px; /* Moved up to make room for input */
             color: white;
             text-align: center;
             width: 100%;
@@ -346,6 +351,11 @@
         .dropdown-item:hover {
             background: #444;
         }
+
+        /* Add style for file input */
+        .hidden-file-input {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -378,48 +388,51 @@
             <div class="scene-controls">
                 <button class="scene-button" id="createScene">Create</button>
                 <button class="scene-button" id="saveScene" disabled>Save</button>
+                <button class="scene-button" id="exportScenes">Export</button>
+                <button class="scene-button" id="importScenes">Import</button>
+                <input type="file" id="importFile" class="hidden-file-input" accept=".json">
             </div>
         </div>
         <div class="slider-panel">
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">8</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="1">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">7</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="2">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">6</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="3">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">5</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="4">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">4</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="5">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">3</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="6">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">2</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="7">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <input type="number" min="1" max="10" value="10" class="brightness-input">
                 <span class="slider-label">1</span>
                 <input type="range" min="1" max="10" value="10" class="spotlight-slider" data-spotlight="8">
+                <input type="number" min="1" max="10" value="10" class="brightness-input">
             </div>
         </div>
     </div>
@@ -469,6 +482,9 @@
         const renameSceneBtn = document.getElementById('renameScene');
         const deleteSceneBtn = document.getElementById('deleteScene');
         const duplicateSceneBtn = document.getElementById('duplicateScene');
+        const exportScenesBtn = document.getElementById('exportScenes');
+        const importScenesBtn = document.getElementById('importScenes');
+        const importFile = document.getElementById('importFile');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
         let currentScene = null;
@@ -632,6 +648,75 @@
             currentScene = sceneName;
             updateScenesList();
         }
+
+        function exportScenes() {
+            const scenesData = {
+                scenes: scenes,
+                exportDate: new Date().toISOString(),
+                version: "1.0"
+            };
+
+            const blob = new Blob([JSON.stringify(scenesData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importScenes(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate the imported data
+                    if (!data.scenes || !data.version) {
+                        throw new Error('Invalid file format');
+                    }
+
+                    // Handle the import
+                    const importedScenes = data.scenes;
+                    const sceneNames = Object.keys(importedScenes);
+                    
+                    if (sceneNames.length === 0) {
+                        alert('No scenes found in file');
+                        return;
+                    }
+
+                    const existingNames = Object.keys(scenes).filter(name => 
+                        sceneNames.includes(name)
+                    );
+
+                    if (existingNames.length > 0) {
+                        if (!confirm(`The following scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
+                            return;
+                        }
+                    }
+
+                    // Merge the imported scenes with existing ones
+                    scenes = { ...scenes, ...importedScenes };
+                    localStorage.setItem('scenes', JSON.stringify(scenes));
+                    updateScenesList();
+                    alert(`Successfully imported ${sceneNames.length} scenes`);
+                } catch (error) {
+                    alert('Error importing scenes: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
+
+        exportScenesBtn.onclick = exportScenes;
+        importScenesBtn.onclick = () => importFile.click();
+        importFile.onchange = importScenes;
 
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
