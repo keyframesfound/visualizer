@@ -19,6 +19,7 @@
             position: relative;
             width: 1200px;
             height: 600px;
+            margin-top: 100px; /* Add margin to prevent overlap with timeline */
         }
 
         /* Stage Floor */
@@ -154,7 +155,7 @@
             display: grid;
             grid-template-columns: 200px 1fr;
             gap: 20px;
-            z-index: 999;
+            z-index: 997; /* Ensure it's below timeline */
         }
 
         .control-panel.open {
@@ -349,9 +350,120 @@
         .dropdown-item:hover {
             background: #444;
         }
+
+        /* Timeline styles */
+        .timeline-container {
+            position: fixed;
+            top: 0;  /* Changed from bottom */
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 998;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timeline-controls {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .timeline-track {
+            flex-grow: 1;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .timeline-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-mark {
+            width: 50px;
+            height: 100%;
+            border-left: 1px solid #444;
+            display: flex;
+            align-items: flex-start;
+            padding-left: 5px;
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .playback-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-right: 10px;
+        }
+
+        .playback-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .timeline-cursor {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            pointer-events: none;
+        }
+
+        .scene-marker {
+            position: absolute;
+            width: 8px;
+            height: 30px;
+            background: #666;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .scene-marker:hover {
+            background: #888;
+        }
+
+        .scene-marker.active {
+            background: #fff;
+        }
+
+        .time-display {
+            color: white;
+            margin-left: 10px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
+    <div class="timeline-container">
+        <div class="timeline-controls">
+            <button class="playback-button" id="playButton">▶</button>
+            <button class="playback-button" id="stopButton">⬛</button>
+            <span class="time-display">00:00</span>
+            <button id="addSceneButton">Add Scene</button>
+        </div>
+        <div class="timeline-track" id="timelineTrack">
+            <div class="timeline-grid" id="timelineGrid"></div>
+            <div class="timeline-cursor" id="timelineCursor"></div>
+        </div>
+    </div>
+
     <div class="stage-container">
         <div class="glass-wall"></div>
         <div class="stage-floor">
@@ -430,6 +542,7 @@
         </div>
     </div>
 
+    <script src="dragndrop.js"></script>
     <script>
         const controlPanelButton = document.querySelector('.control-panel-button');
         const controlPanel = document.querySelector('.control-panel');
@@ -794,6 +907,123 @@
 
         // Initial render
         updateScenesList();
+
+        // Timeline functionality
+        const timelineGrid = document.getElementById('timelineGrid');
+        const timelineCursor = document.getElementById('timelineCursor');
+        const playButton = document.getElementById('playButton');
+        const stopButton = document.getElementById('stopButton');
+        const timeDisplay = document.querySelector('.time-display');
+        const timelineTrack = document.querySelector('.timeline-track');
+
+        let isPlaying = false;
+        let currentTime = 0;
+        let animationFrame;
+        const TIMELINE_DURATION = 300; // 5 minutes in seconds
+        const MARKS_INTERVAL = 5; // 5 seconds between marks
+
+        // Create timeline marks
+        for (let i = 0; i <= TIMELINE_DURATION; i += MARKS_INTERVAL) {
+            const mark = document.createElement('div');
+            mark.className = 'timeline-mark';
+            mark.style.left = `${(i / TIMELINE_DURATION) * 100}%`;
+            mark.textContent = `${Math.floor(i / 60)}:${(i % 60).toString().padStart(2, '0')}`;
+            timelineGrid.appendChild(mark);
+        }
+
+        function updateTimeDisplay(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateCursor(seconds) {
+            const position = (seconds / TIMELINE_DURATION) * timelineTrack.clientWidth;
+            timelineCursor.style.left = `${position}px`;
+            updateTimeDisplay(seconds);
+        }
+
+        let lastTimestamp = 0;
+        function animate(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            currentTime += delta;
+            if (currentTime >= TIMELINE_DURATION) {
+                stopPlayback();
+                return;
+            }
+
+            updateCursor(currentTime);
+            if (isPlaying) {
+                animationFrame = requestAnimationFrame(animate);
+            }
+        }
+
+        function togglePlayback() {
+            isPlaying = !isPlaying;
+            playButton.textContent = isPlaying ? '⏸' : '▶';
+            
+            if (isPlaying) {
+                lastTimestamp = 0;
+                animationFrame = requestAnimationFrame(animate);
+            } else {
+                cancelAnimationFrame(animationFrame);
+            }
+        }
+
+        function stopPlayback() {
+            isPlaying = false;
+            playButton.textContent = '▶';
+            cancelAnimationFrame(animationFrame);
+            currentTime = 0;
+            updateCursor(currentTime);
+            lastTimestamp = 0;
+        }
+
+        playButton.addEventListener('click', togglePlayback);
+        stopButton.addEventListener('click', stopPlayback);
+
+        timelineTrack.addEventListener('click', (e) => {
+            const rect = timelineTrack.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            currentTime = (x / timelineTrack.clientWidth) * TIMELINE_DURATION;
+            updateCursor(currentTime);
+        });
+
+        // Initialize cursor position
+        updateCursor(0);
+
+        // Modify the updateScenesList function to add scene markers to timeline
+        const originalUpdateScenesList = updateScenesList;
+        updateScenesList = function() {
+            originalUpdateScenesList();
+            
+            // Clear existing markers
+            const existingMarkers = timelineTrack.querySelectorAll('.scene-marker');
+            existingMarkers.forEach(marker => marker.remove());
+
+            // Add scene markers
+            Object.keys(scenes).forEach((sceneName, index) => {
+                const marker = document.createElement('div');
+                marker.className = 'scene-marker';
+                marker.title = sceneName;
+                // Position markers evenly across timeline for now
+                const position = (index / (Object.keys(scenes).length - 1 || 1)) * 100;
+                marker.style.left = `${position}%`;
+                timelineTrack.appendChild(marker);
+
+                marker.addEventListener('click', () => loadScene(sceneName));
+            });
+        };
+    </script>
+    <script src="timeline.js"></script>
+    <script>
+        const timeline = new Timeline();
+        document.getElementById('addSceneButton').addEventListener('click', () => {
+            timeline.addScene();
+        });
     </script>
 </body>
 </html>
