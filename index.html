@@ -5,6 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stage Lighting Planner</title>
     <style>
+        /* Add loading screen styles at the top */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Hide main content initially */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -487,108 +534,131 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <div class="stage-container">
-        <div class="stage-floor">
-            <!-- Add monitors just after stage-floor opening tag -->
-            <div class="stage-monitor" id="monitor-left"></div>
-            <div class="stage-monitor" id="monitor-right"></div>
-            <!-- Spotlight Locations -->
-            <div class="spotlight-location" id="spotlight-1">1</div>
-            <div class="spotlight-location" id="spotlight-2">2</div>
-            <div class="spotlight-location" id="spotlight-3">3</div>
-            <div class="spotlight-location" id="spotlight-4">4</div>
-            <div class="spotlight-location" id="spotlight-5">5</div>
-            <div class="spotlight-location" id="spotlight-6">6</div>
-            <div class="spotlight-location" id="spotlight-7">7</div>
-            <div class="spotlight-location" id="spotlight-8">8</div>
-        </div>
-
-        <!-- Stage Labels -->
-        <div class="stage-label" id="stage-right">Stage Left</div>
-        <div class="stage-label" id="stage-left">Stage Right</div>
-
-        <div class="audience-label">Audience</div>
-    </div>
-    <button class="control-panel-button">Control Panel</button>
-    <button class="export-pdf-button">Export Layout PDF</button>
-    <div class="control-panel">
-        <div class="scene-manager">
-            <div class="scene-list" id="sceneList">
-                <!-- Scenes will be added here dynamically -->
-            </div>
-            <div class="scene-controls">
-                <button class="scene-button" id="createScene">Create</button>
-                <button class="scene-button" id="saveScene" disabled>Save</button>
-                <button class="scene-button" id="exportScenes">Export</button>
-                <button class="scene-button" id="importScenes">Import</button>
-                <input type="file" id="importFile" class="hidden-file-input" accept=".json">
-            </div>
-        </div>
-        <div class="slider-panel">
-            <div class="slider-container">
-                <span class="slider-label">1</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="1">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">2</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="2">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">3</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="3">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">4</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="4">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">5</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="5">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">6</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="6">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">7</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="7">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
-            <div class="slider-container">
-                <span class="slider-label">8</span>
-                <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="8">
-                <input type="number" min="0" max="10" value="10" class="brightness-input">
-            </div>
+    <!-- Add loading screen -->
+    <div class="loading-screen">
+        <div class="loading-content">
+            <img src="sitefile/logo.png" alt="Logo" class="loading-logo">
         </div>
     </div>
 
-    <div class="props-panel">
-        <div class="prop-item" data-prop="chair" title="Chair">
-            🪑
-            <small>Chair</small>
+    <!-- Wrap existing content in main-content div -->
+    <div class="main-content">
+        <div class="stage-container">
+            <div class="stage-floor">
+                <!-- Add monitors just after stage-floor opening tag -->
+                <div class="stage-monitor" id="monitor-left"></div>
+                <div class="stage-monitor" id="monitor-right"></div>
+                <!-- Spotlight Locations -->
+                <div class="spotlight-location" id="spotlight-1">1</div>
+                <div class="spotlight-location" id="spotlight-2">2</div>
+                <div class="spotlight-location" id="spotlight-3">3</div>
+                <div class="spotlight-location" id="spotlight-4">4</div>
+                <div class="spotlight-location" id="spotlight-5">5</div>
+                <div class="spotlight-location" id="spotlight-6">6</div>
+                <div class="spotlight-location" id="spotlight-7">7</div>
+                <div class="spotlight-location" id="spotlight-8">8</div>
+            </div>
+
+            <!-- Stage Labels -->
+            <div class="stage-label" id="stage-right">Stage Left</div>
+            <div class="stage-label" id="stage-left">Stage Right</div>
+
+            <div class="audience-label">Audience</div>
         </div>
-        <div class="prop-item" data-prop="table" title="Table">
-            📋
-            <small>Table</small>
+        <button class="control-panel-button">Control Panel</button>
+        <button class="export-pdf-button">Export Layout PDF</button>
+        <div class="control-panel">
+            <div class="scene-manager">
+                <div class="scene-list" id="sceneList">
+                    <!-- Scenes will be added here dynamically -->
+                </div>
+                <div class="scene-controls">
+                    <button class="scene-button" id="createScene">Create</button>
+                    <button class="scene-button" id="saveScene" disabled>Save</button>
+                    <button class="scene-button" id="exportScenes">Export</button>
+                    <button class="scene-button" id="importScenes">Import</button>
+                    <input type="file" id="importFile" class="hidden-file-input" accept=".json">
+                </div>
+            </div>
+            <div class="slider-panel">
+                <div class="slider-container">
+                    <span class="slider-label">1</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="1">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">2</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="2">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">3</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="3">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">4</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="4">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">5</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="5">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">6</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="6">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">7</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="7">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+                <div class="slider-container">
+                    <span class="slider-label">8</span>
+                    <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="8">
+                    <input type="number" min="0" max="10" value="10" class="brightness-input">
+                </div>
+            </div>
         </div>
-        <div class="prop-item" data-prop="mic-stand" title="Straight Mic">
-            🎤
-            <small>Mic</small>
-        </div>
-        <div class="prop-item" data-prop="mic-condenser" title="Condenser Mic">
-            🎙️
-            <small><Cap></Cap>Condenser</small>
+
+        <div class="props-panel">
+            <div class="prop-item" data-prop="chair" title="Chair">
+                🪑
+                <small>Chair</small>
+            </div>
+            <div class="prop-item" data-prop="table" title="Table">
+                📋
+                <small>Table</small>
+            </div>
+            <div class="prop-item" data-prop="mic-stand" title="Straight Mic">
+                🎤
+                <small>Mic</small>
+            </div>
+            <div class="prop-item" data-prop="mic-condenser" title="Condenser Mic">
+                🎙️
+                <small><Cap></Cap>Condenser</small>
+            </div>
         </div>
     </div>
 
     <script src="dragndrop.js"></script>
     <script>
+        // Add loading screen handler at the start of your scripts
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.loading-screen').classList.add('fade-out');
+                document.querySelector('.main-content').classList.add('visible');
+                
+                // Remove loading screen after animation
+                setTimeout(() => {
+                    document.querySelector('.loading-screen').remove();
+                }, 500);
+            }, 1500); // Show loading screen for 1.5 seconds
+        });
+
         const controlPanelButton = document.querySelector('.control-panel-button');
         const controlPanel = document.querySelector('.control-panel');
         const sliders = document.querySelectorAll('.spotlight-slider');
