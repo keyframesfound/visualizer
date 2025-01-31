@@ -17,15 +17,15 @@
 
         .stage-container {
             position: relative;
-            width: 1200px;
+            width: 1300px;  /* Only change: increased from 1200px */
             height: 600px;
-            margin-top: -300px;  /* Changed from 100px to 20px */
+            margin-top: -300px;
             perspective: 1000px;
         }
 
         .stage-floor {
             position: absolute;
-            bottom: 0;  /* Changed from bottom: 50px */
+            bottom: 0;
             width: 100%;
             height: 400px;
             background: linear-gradient(to bottom right, #8b4513, #6b2d0f);
@@ -33,7 +33,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 20px;  /* Reverted back to original */
             transform: perspective(1000px) rotateX(5deg);
             transform-origin: bottom;
         }
@@ -54,7 +54,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            margin: 0 -5px;
+            margin: 0 px;  /* Reverted back to original */
         }
 
         .spotlight-location:hover {
@@ -317,15 +317,125 @@
         }
 
         #monitor-left {
-            left: 15%;
+            left: 15%;  /* Reverted back to original */
             bottom: 5%;
         }
 
         #monitor-right {
-            right: 15%;
+            right: 15%;  /* Reverted back to original */
             bottom: 5%;
         }
+
+        .props-panel {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;  /* Increased from 15px */
+            border-radius: 12px;  /* Increased from 8px */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;  /* Increased from 10px */
+            z-index: 100;
+        }
+
+        .prop-item {
+            width: 60px;  /* Increased from 40px */
+            height: 60px;  /* Increased from 40px */
+            background: white;
+            border-radius: 8px;  /* Increased from 4px */
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;  /* Increased from 24px */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;  /* Increased from 2px */
+            padding: 8px;  /* Increased from 5px */
+            height: auto;
+        }
+
+        .prop-item small {
+            font-size: 12px;  /* Increased from 10px */
+            opacity: 0.8;
+            color: black;
+        }
+
+        .stage-prop {
+            position: absolute;
+            cursor: move;
+            z-index: 10;
+        }
+
+        .prop-chair {
+            width: 30px;
+            height: 30px;
+            background: black;  /* Already black */
+        }
+
+        .prop-table {
+            width: 60px;
+            height: 40px;
+            background: #2e8b57;  /* Changed to sea green */
+        }
+
+        .prop-mic {
+            width: 8px;
+            height: 40px;
+            background: #1e90ff;  /* Changed to dodger blue */
+            border-radius: 4px;
+        }
+
+        .prop-mic-stand {
+            width: 8px;
+            height: 40px;
+            background: #1e90ff;  /* Changed to dodger blue */
+            border-radius: 4px;
+        }
+
+        .prop-mic-stand::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -6px;
+            width: 20px;
+            height: 20px;
+            background: #1e90ff;  /* Changed to dodger blue */
+            border-radius: 50%;
+        }
+
+        .prop-mic-condenser {
+            width: 15px;
+            height: 40px;
+            background: #1e90ff;  /* Changed to dodger blue */
+            border-radius: 4px;
+        }
+
+        .export-pdf-button {
+            position: fixed;
+            bottom: 20px;
+            right: 160px;  /* Position it to the left of control panel button */
+            padding: 10px 20px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .export-pdf-button:hover {
+            background: #555;
+        }
     </style>
+    
+    <!-- Add these scripts in the head section -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="stage-container">
@@ -351,6 +461,7 @@
         <div class="audience-label">Audience</div>
     </div>
     <button class="control-panel-button">Control Panel</button>
+    <button class="export-pdf-button">Export Layout PDF</button>
     <div class="control-panel">
         <div class="scene-manager">
             <div class="scene-list" id="sceneList">
@@ -405,6 +516,25 @@
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="8">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
+        </div>
+    </div>
+
+    <div class="props-panel">
+        <div class="prop-item" data-prop="chair" title="Chair">
+            🪑
+            <small>Chair</small>
+        </div>
+        <div class="prop-item" data-prop="table" title="Table">
+            📋
+            <small>Table</small>
+        </div>
+        <div class="prop-item" data-prop="mic-stand" title="Straight Mic">
+            🎤
+            <small>Mic</small>
+        </div>
+        <div class="prop-item" data-prop="mic-condenser" title="Condenser Mic">
+            🎙️
+            <small><Cap></Cap>Condenser</small>
         </div>
     </div>
 
@@ -589,11 +719,26 @@
         }
 
         function getSceneData() {
-            const sceneData = {};
+            const sceneData = {
+                spotlights: {},
+                props: []
+            };
+            
+            // Get spotlight values
             sliders.forEach(slider => {
                 const value = Math.min(10, Math.max(0, parseInt(slider.value) || 10));
-                sceneData[slider.dataset.spotlight] = value;
+                sceneData.spotlights[slider.dataset.spotlight] = value;
             });
+            
+            // Get prop positions
+            document.querySelectorAll('.stage-prop').forEach(prop => {
+                sceneData.props.push({
+                    type: prop.className.split('prop-')[1],
+                    left: prop.style.left,
+                    top: prop.style.top
+                });
+            });
+            
             return sceneData;
         }
 
@@ -661,9 +806,28 @@
 
             const animationPromises = [];
 
+            // Clear existing props
+            document.querySelectorAll('.stage-prop').forEach(prop => prop.remove());
+
+            // Load props
+            if (sceneData.props) {
+                sceneData.props.forEach(prop => {
+                    const stageProp = document.createElement('div');
+                    stageProp.className = `stage-prop prop-${prop.type}`;
+                    stageProp.style.left = prop.left;
+                    stageProp.style.top = prop.top;
+                    document.querySelector('.stage-floor').appendChild(stageProp);
+                    
+                    // Add drag functionality to loaded props
+                    makeElementDraggable(stageProp);
+                });
+            }
+
+            // Load spotlight values
+            const spotlightData = sceneData.spotlights || sceneData; // Backward compatibility
             sliders.forEach(slider => {
                 const spotlightNum = slider.dataset.spotlight;
-                const targetValue = Math.min(10, Math.max(0, sceneData[spotlightNum] || 10));
+                const targetValue = Math.min(10, Math.max(0, spotlightData[spotlightNum] || 10));
                 const promise = animateSlider(slider, targetValue);
                 animationPromises.push(promise);
             });
@@ -671,6 +835,38 @@
             await Promise.all(animationPromises);
             currentScene = sceneName;
             updateScenesList();
+        }
+
+        function makeElementDraggable(element) {
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            
+            element.addEventListener('mousedown', startDragging);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDragging);
+            
+            function startDragging(e) {
+                initialX = e.clientX - element.offsetLeft;
+                initialY = e.clientY - element.offsetTop;
+                isDragging = true;
+            }
+            
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    element.style.left = `${currentX}px`;
+                    element.style.top = `${currentY}px`;
+                }
+            }
+            
+            function stopDragging() {
+                isDragging = false;
+            }
         }
 
         function exportScenes() {
@@ -750,6 +946,95 @@
         saveSceneBtn.onclick = saveScene;
 
         updateScenesList();
+
+        document.querySelectorAll('.prop-item').forEach(prop => {
+            prop.addEventListener('mousedown', (e) => {
+                const type = prop.dataset.prop;
+                const stageProp = document.createElement('div');
+                stageProp.className = `stage-prop prop-${type}`;
+                
+                // Get stage floor position and dimensions
+                const stageFloor = document.querySelector('.stage-floor');
+                const stageRect = stageFloor.getBoundingClientRect();
+                
+                // Calculate center position of stage, placing it higher up
+                const centerX = stageRect.left + (stageRect.width / 2);
+                const centerY = stageRect.top + (stageRect.height / 3); // Changed from /2 to /3 to spawn higher
+                
+                // Position prop at stage center
+                stageProp.style.left = `${centerX}px`;
+                stageProp.style.top = `${centerY}px`;
+                
+                stageFloor.appendChild(stageProp);
+                makeElementDraggable(stageProp);
+            });
+        });
+
+        // Add PDF export functionality
+        function exportLayoutPDF() {
+            const stageContainer = document.querySelector('.stage-container');
+            
+            // Temporarily hide spotlights for the capture
+            const spotlights = document.querySelectorAll('.spotlight-location');
+            spotlights.forEach(spot => spot.style.display = 'none');
+            
+            html2canvas(stageContainer).then(canvas => {
+                // Restore spotlights
+                spotlights.forEach(spot => spot.style.display = '');
+                
+                // Count props
+                const propCounts = {};
+                document.querySelectorAll('.stage-prop').forEach(prop => {
+                    const type = prop.className.split('prop-')[1];
+                    propCounts[type] = (propCounts[type] || 0) + 1;
+                });
+                
+                // Create PDF in portrait orientation
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [canvas.width, canvas.height + 200] // More space for inventory
+                });
+                
+                // Scale down the image to fit portrait orientation
+                const scale = pdf.internal.pageSize.width / canvas.width;
+                const scaledHeight = canvas.height * scale;
+                
+                // Add stage image
+                pdf.addImage(
+                    canvas.toDataURL('image/png'), 
+                    'PNG', 
+                    0, 
+                    0, 
+                    pdf.internal.pageSize.width, 
+                    scaledHeight
+                );
+                
+                // Add inventory count with larger font
+                pdf.setFontSize(24); // Increased font size
+                pdf.setFont("helvetica", "bold");
+                pdf.text('Stage Layout Inventory:', 20, scaledHeight + 40);
+                
+                pdf.setFontSize(18); // Slightly smaller for inventory items
+                pdf.setFont("helvetica", "normal");
+                let yPos = scaledHeight + 70;
+                for (const [prop, count] of Object.entries(propCounts)) {
+                    // Format prop name to be more readable
+                    const propName = prop.split('-').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    pdf.text(`${propName}: ${count}`, 20, yPos);
+                    yPos += 30;
+                }
+                
+                // Save the PDF
+                pdf.save(`stage-layout-${new Date().toISOString().split('T')[0]}.pdf`);
+            });
+        }
+
+        // Add click handler for PDF export button
+        document.querySelector('.export-pdf-button').addEventListener('click', exportLayoutPDF);
     </script>
     <script src="timeline.js"></script>
 </body>
