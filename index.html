@@ -165,10 +165,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
             width: 60px;
             height: 160px;
             position: relative;
             margin: 0 15px;
+            padding: 20px 0;
         }
 
         .slider-container input[type="range"] {
@@ -177,16 +179,28 @@
             width: 150px;
             height: 4px;
             background: #555;
-            transform: rotate(270deg) translateX(-65px);
-            transform-origin: right;
-            top: 50%;
+            transform: rotate(270deg);
+            transform-origin: center;
+            left: -45px;  /* Centers the slider horizontally */
+            top: 75px;   /* Centers the slider vertically */
         }
 
         .slider-label {
             position: absolute;
-            bottom: 0;
+            bottom: 10px;
             color: white;
             text-align: center;
+            width: 100%;
+        }
+
+        /* Add styling for range input thumb */
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
         }
     </style>
 </head>
