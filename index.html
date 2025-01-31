@@ -928,10 +928,11 @@
                 props: []
             };
             
-            // Get spotlight values
-            sliders.forEach(slider => {
-                const value = Math.min(10, Math.max(0, parseInt(slider.value) || 10));
-                sceneData.spotlights[slider.dataset.spotlight] = value;
+            // Get spotlight values - Fixed to ensure proper value capture
+            document.querySelectorAll('.spotlight-slider').forEach(slider => {
+                const spotlightNum = slider.dataset.spotlight;
+                const value = parseInt(slider.value) || 0;
+                sceneData.spotlights[spotlightNum] = value;
             });
             
             // Get prop positions
@@ -1032,17 +1033,21 @@
                     stageProp.style.left = prop.left;
                     stageProp.style.top = prop.top;
                     document.querySelector('.stage-floor').appendChild(stageProp);
-                    
-                    // Add drag functionality to loaded props
                     makeElementDraggable(stageProp);
                 });
             }
 
-            // Load spotlight values
-            const spotlightData = sceneData.spotlights || sceneData; // Backward compatibility
-            sliders.forEach(slider => {
+            // Load spotlight values - Fixed to ensure proper value assignment
+            const spotlightData = sceneData.spotlights || {};
+            document.querySelectorAll('.spotlight-slider').forEach(slider => {
                 const spotlightNum = slider.dataset.spotlight;
-                const targetValue = Math.min(10, Math.max(0, spotlightData[spotlightNum] || 10));
+                const targetValue = Math.min(10, Math.max(0, spotlightData[spotlightNum] || 0));
+                
+                // Update the corresponding number input
+                const container = slider.parentElement;
+                const numberInput = container.querySelector('.brightness-input');
+                numberInput.value = targetValue;
+                
                 const promise = animateSlider(slider, targetValue);
                 animationPromises.push(promise);
             });
@@ -1304,6 +1309,36 @@
 
         // Add click handler for PDF export button
         document.querySelector('.export-pdf-button').addEventListener('click', exportLayoutPDF);
+
+        // Update the slider input handler to ensure proper value synchronization
+        sliders.forEach(slider => {
+            const container = slider.parentElement;
+            const numberInput = container.querySelector('.brightness-input');
+            
+            slider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                numberInput.value = value;
+                updateSpotlightOpacity(slider, value);
+                
+                // Enable save button when changes are made
+                if (currentScene) {
+                    saveSceneBtn.disabled = false;
+                }
+            });
+
+            numberInput.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                value = Math.min(10, Math.max(0, value));
+                e.target.value = value;
+                slider.value = value;
+                updateSpotlightOpacity(slider, value);
+                
+                // Enable save button when changes are made
+                if (currentScene) {
+                    saveSceneBtn.disabled = false;
+                }
+            });
+        });
     </script>
 </body>
 </html>
