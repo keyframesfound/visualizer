@@ -130,7 +130,7 @@
         /* Control Panel Styles */
         .control-panel-button {
             position: fixed;
-            bottom: 120px;  /* Lowered back down */
+            bottom: 20px;  /* Moved closer to bottom */
             right: 20px;
             padding: 10px 20px;
             background: #444;
@@ -143,10 +143,10 @@
 
         .control-panel {
             position: fixed;
-            bottom: -200px;  /* Increased height */
+            bottom: -300px;  /* Increased from -200px */
             left: 0;
             width: 100%;
-            height: 200px; /* Increased height for vertical sliders */
+            height: 300px; /* Increased from 200px */
             background: rgba(0, 0, 0, 0.9);
             padding: 20px;
             box-sizing: border-box;
@@ -158,7 +158,7 @@
         }
 
         .control-panel.open {
-            bottom: 100px;  /* Lowered back down but still slightly elevated from bottom */
+            bottom: 0;  /* Changed to sit at bottom */
         }
 
         .scene-manager {
@@ -244,6 +244,7 @@
             transform-origin: center;
             left: -45px;  /* Centers the slider horizontally */
             top: 75px;   /* Centers the slider vertically */
+            transition: all 0.5s ease;  /* Add transition for smoother slider movement */
         }
 
         .slider-label {
@@ -386,13 +387,52 @@
             updateScenesList();
         }
 
-        function loadScene(sceneName) {
-            const sceneData = scenes[sceneName];
-            sliders.forEach(slider => {
-                slider.value = sceneData[slider.dataset.spotlight] || 100;
-                const event = new Event('input');
-                slider.dispatchEvent(event);
+        function animateSlider(slider, targetValue) {
+            return new Promise(resolve => {
+                const startValue = parseInt(slider.value);
+                const startTime = performance.now();
+                const duration = 500; // Animation duration in milliseconds
+
+                function updateValue(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smooth animation
+                    const easeProgress = progress < .5 ? 
+                        4 * progress * progress * progress : 
+                        1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                    const currentValue = startValue + (targetValue - startValue) * easeProgress;
+                    slider.value = currentValue;
+                    
+                    // Trigger the input event to update spotlight opacity
+                    const event = new Event('input');
+                    slider.dispatchEvent(event);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateValue);
+                    } else {
+                        resolve();
+                    }
+                }
+
+                requestAnimationFrame(updateValue);
             });
+        }
+
+        async function loadScene(sceneName) {
+            const sceneData = scenes[sceneName];
+            const animationPromises = [];
+
+            sliders.forEach(slider => {
+                const targetValue = sceneData[slider.dataset.spotlight] || 100;
+                const promise = animateSlider(slider, targetValue);
+                animationPromises.push(promise);
+            });
+
+            // Wait for all animations to complete
+            await Promise.all(animationPromises);
+            
             currentScene = sceneName;
             updateScenesList();
         }
