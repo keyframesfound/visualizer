@@ -305,11 +305,34 @@
             font-weight: bold;
             text-shadow: 1px 1px 2px #000;
         }
+
+        .stage-monitor {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            transform: perspective(500px) rotateX(5deg);
+        }
+
+        #monitor-left {
+            left: 15%;
+            bottom: 5%;
+        }
+
+        #monitor-right {
+            right: 15%;
+            bottom: 5%;
+        }
     </style>
 </head>
 <body>
     <div class="stage-container">
         <div class="stage-floor">
+            <!-- Add monitors just after stage-floor opening tag -->
+            <div class="stage-monitor" id="monitor-left"></div>
+            <div class="stage-monitor" id="monitor-right"></div>
             <!-- Spotlight Locations -->
             <div class="spotlight-location" id="spotlight-1">1</div>
             <div class="spotlight-location" id="spotlight-2">2</div>
