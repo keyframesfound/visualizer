@@ -201,8 +201,6 @@
         .scene-controls {
             display: flex;
             gap: 5px;
-            flex-wrap: wrap; /* Allow buttons to wrap */
-            justify-content: flex-start;
         }
 
         .scene-button {
@@ -351,11 +349,6 @@
         .dropdown-item:hover {
             background: #444;
         }
-
-        /* Add style for file input */
-        .hidden-file-input {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -388,9 +381,6 @@
             <div class="scene-controls">
                 <button class="scene-button" id="createScene">Create</button>
                 <button class="scene-button" id="saveScene" disabled>Save</button>
-                <button class="scene-button" id="exportScenes">Export</button>
-                <button class="scene-button" id="importScenes">Import</button>
-                <input type="file" id="importFile" class="hidden-file-input" accept=".json">
             </div>
         </div>
         <div class="slider-panel">
@@ -482,9 +472,6 @@
         const renameSceneBtn = document.getElementById('renameScene');
         const deleteSceneBtn = document.getElementById('deleteScene');
         const duplicateSceneBtn = document.getElementById('duplicateScene');
-        const exportScenesBtn = document.getElementById('exportScenes');
-        const importScenesBtn = document.getElementById('importScenes');
-        const importFile = document.getElementById('importFile');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
         let currentScene = null;
@@ -582,29 +569,58 @@
         // Modify the existing scene functions to work with the new menu
         function duplicateScene(sceneName = currentScene) {
             if (!sceneName) return;
-            // ... rest of existing duplicate function ...
+            
+            const baseName = sceneName;
+            let newName = `${baseName} (copy)`;
+            let counter = 1;
+            
+            // Find an available name if the copy name already exists
+            while (scenes[newName]) {
+                counter++;
+                newName = `${baseName} (copy ${counter})`;
+            }
+            
+            // Deep copy the scene data
+            scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            currentScene = newName;
+            updateScenesList();
         }
 
         function renameScene(sceneName = currentScene) {
             if (!sceneName) return;
-            // ... rest of existing rename function ...
+            
+            const newName = prompt('Enter new scene name:', sceneName);
+            if (!newName || newName === sceneName) return;
+            
+            if (scenes[newName]) {
+                alert('A scene with this name already exists');
+                return;
+            }
+            
+            scenes[newName] = scenes[sceneName];
+            delete scenes[sceneName];
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            currentScene = newName;
+            updateScenesList();
         }
 
         function deleteScene(sceneName = currentScene) {
             if (!sceneName) return;
-            // ... rest of existing delete function ...
+            
+            if (confirm(`Are you sure you want to delete scene "${sceneName}"?`)) {
+                delete scenes[sceneName];
+                localStorage.setItem('scenes', JSON.stringify(scenes));
+                currentScene = null;
+                updateScenesList();
+            }
         }
-
-        // Remove the old button event listeners
-        // createSceneBtn.onclick and saveSceneBtn.onclick remain the same
-        // Remove duplicateSceneBtn, renameSceneBtn, and deleteSceneBtn references and listeners
-        
-        // ...rest of existing code...
 
         function getSceneData() {
             const sceneData = {};
             sliders.forEach(slider => {
-                sceneData[slider.dataset.spotlight] = parseInt(slider.value);
+                const value = Math.min(10, Math.max(1, parseInt(slider.value) || 10));
+                sceneData[slider.dataset.spotlight] = value;
             });
             return sceneData;
         }
@@ -630,17 +646,57 @@
             alert('Scene saved successfully');
         }
 
+        function animateSlider(slider, targetValue) {
+            return new Promise(resolve => {
+                const startValue = parseInt(slider.value);
+                const startTime = performance.now();
+                const duration = 500; // Animation duration in milliseconds
+
+                function updateValue(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smooth animation
+                    const easeProgress = progress < .5 ? 
+                        4 * progress * progress * progress : 
+                        1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                    const currentValue = Math.round(startValue + (targetValue - startValue) * easeProgress);
+                    slider.value = currentValue;
+                    
+                    // Update both the slider and spotlight opacity
+                    const spotlightNum = slider.dataset.spotlight;
+                    const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
+                    const opacity = currentValue / 10;
+                    spotlight.style.opacity = opacity;
+
+                    // Also update the number input
+                    const container = slider.parentElement;
+                    const numberInput = container.querySelector('.brightness-input');
+                    numberInput.value = currentValue;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateValue);
+                    } else {
+                        resolve();
+                    }
+                }
+
+                requestAnimationFrame(updateValue);
+            });
+        }
+
         async function loadScene(sceneName) {
             const sceneData = scenes[sceneName];
+            if (!sceneData) return;
+
             const animationPromises = [];
 
             sliders.forEach(slider => {
-                const container = slider.parentElement;
-                const numberInput = container.querySelector('.brightness-input');
-                const targetValue = sceneData[slider.dataset.spotlight] || 10;
-                const promise = animateSlider(slider, targetValue).then(() => {
-                    numberInput.value = targetValue;
-                });
+                const spotlightNum = slider.dataset.spotlight;
+                // Make sure we get a value between 1-10
+                const targetValue = Math.min(10, Math.max(1, sceneData[spotlightNum] || 10));
+                const promise = animateSlider(slider, targetValue);
                 animationPromises.push(promise);
             });
 
@@ -648,75 +704,6 @@
             currentScene = sceneName;
             updateScenesList();
         }
-
-        function exportScenes() {
-            const scenesData = {
-                scenes: scenes,
-                exportDate: new Date().toISOString(),
-                version: "1.0"
-            };
-
-            const blob = new Blob([JSON.stringify(scenesData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function importScenes(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    // Validate the imported data
-                    if (!data.scenes || !data.version) {
-                        throw new Error('Invalid file format');
-                    }
-
-                    // Handle the import
-                    const importedScenes = data.scenes;
-                    const sceneNames = Object.keys(importedScenes);
-                    
-                    if (sceneNames.length === 0) {
-                        alert('No scenes found in file');
-                        return;
-                    }
-
-                    const existingNames = Object.keys(scenes).filter(name => 
-                        sceneNames.includes(name)
-                    );
-
-                    if (existingNames.length > 0) {
-                        if (!confirm(`The following scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
-                            return;
-                        }
-                    }
-
-                    // Merge the imported scenes with existing ones
-                    scenes = { ...scenes, ...importedScenes };
-                    localStorage.setItem('scenes', JSON.stringify(scenes));
-                    updateScenesList();
-                    alert(`Successfully imported ${sceneNames.length} scenes`);
-                } catch (error) {
-                    alert('Error importing scenes: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Reset file input
-        }
-
-        exportScenesBtn.onclick = exportScenes;
-        importScenesBtn.onclick = () => importFile.click();
-        importFile.onchange = importScenes;
 
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
