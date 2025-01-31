@@ -151,14 +151,75 @@
             padding: 20px;
             box-sizing: border-box;
             transition: bottom 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
             z-index: 999;
         }
 
         .control-panel.open {
             bottom: 0;  /* Changed from right to bottom */
+        }
+
+        .scene-manager {
+            border-right: 1px solid #444;
+            padding-right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scene-list {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .scene-item {
+            padding: 8px;
+            background: #444;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scene-item:hover {
+            background: #555;
+        }
+
+        .scene-item.active {
+            background: #666;
+            border: 1px solid #888;
+        }
+
+        .scene-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .scene-button {
+            padding: 5px 10px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .scene-button:hover {
+            background: #555;
+        }
+
+        .slider-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .slider-container {
@@ -227,37 +288,48 @@
     </div>
     <button class="control-panel-button">Control Panel</button>
     <div class="control-panel">
-        <div class="slider-container">
-            <span class="slider-label">8</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="1">
+        <div class="scene-manager">
+            <div class="scene-list" id="sceneList">
+                <!-- Scenes will be added here dynamically -->
+            </div>
+            <div class="scene-controls">
+                <button class="scene-button" id="newScene">New Scene</button>
+                <button class="scene-button" id="saveScene">Save Scene</button>
+            </div>
         </div>
-        <div class="slider-container">
-            <span class="slider-label">7</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="2">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">6</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="3">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">5</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="4">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">4</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="5">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">3</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="6">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">2</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="7">
-        </div>
-        <div class="slider-container">
-            <span class="slider-label">1</span>
-            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="8">
+        <div class="slider-panel">
+            <div class="slider-container">
+                <span class="slider-label">8</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="1">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">7</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="2">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">6</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="3">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">5</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="4">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">4</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="5">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">3</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="6">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">2</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="7">
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">1</span>
+                <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="8">
+            </div>
         </div>
     </div>
 
@@ -278,6 +350,70 @@
                 spotlight.style.opacity = opacity;
             });
         });
+
+        // Scene Management
+        const sceneList = document.getElementById('sceneList');
+        const newSceneBtn = document.getElementById('newScene');
+        const saveSceneBtn = document.getElementById('saveScene');
+        
+        let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
+        let currentScene = null;
+
+        function updateScenesList() {
+            sceneList.innerHTML = '';
+            Object.keys(scenes).forEach(sceneName => {
+                const sceneDiv = document.createElement('div');
+                sceneDiv.className = 'scene-item';
+                sceneDiv.textContent = sceneName;
+                sceneDiv.onclick = () => loadScene(sceneName);
+                if (currentScene === sceneName) {
+                    sceneDiv.classList.add('active');
+                }
+                sceneList.appendChild(sceneDiv);
+            });
+        }
+
+        function saveScene() {
+            const sceneName = prompt('Enter scene name:');
+            if (!sceneName) return;
+
+            const sceneData = {};
+            sliders.forEach(slider => {
+                sceneData[slider.dataset.spotlight] = slider.value;
+            });
+
+            scenes[sceneName] = sceneData;
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            currentScene = sceneName;
+            updateScenesList();
+        }
+
+        function loadScene(sceneName) {
+            const sceneData = scenes[sceneName];
+            sliders.forEach(slider => {
+                slider.value = sceneData[slider.dataset.spotlight] || 100;
+                const event = new Event('input');
+                slider.dispatchEvent(event);
+            });
+            currentScene = sceneName;
+            updateScenesList();
+        }
+
+        function createNewScene() {
+            sliders.forEach(slider => {
+                slider.value = 100;
+                const event = new Event('input');
+                slider.dispatchEvent(event);
+            });
+            currentScene = null;
+            updateScenesList();
+        }
+
+        newSceneBtn.onclick = createNewScene;
+        saveSceneBtn.onclick = saveScene;
+
+        // Initial render
+        updateScenesList();
     </script>
 </body>
 </html>
