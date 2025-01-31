@@ -19,12 +19,13 @@
             position: relative;
             width: 1200px;
             height: 600px;
-            margin-top: 100px;
+            margin-top: -300px;  /* Changed from 100px to 20px */
+            perspective: 1000px;
         }
 
         .stage-floor {
             position: absolute;
-            bottom: 50px;
+            bottom: 0;  /* Changed from bottom: 50px */
             width: 100%;
             height: 400px;
             background: linear-gradient(to bottom right, #8b4513, #6b2d0f);
@@ -33,6 +34,8 @@
             justify-content: space-around;
             align-items: center;
             padding: 0 20px;
+            transform: perspective(1000px) rotateX(5deg);
+            transform-origin: bottom;
         }
 
         .spotlight-location {
@@ -78,34 +81,15 @@
         }
 
         #stage-left {
-            left: 20px;
+            left: 50px;
             bottom: 60%;
-            transform: translateY(50%);
+            transform: translateY(100%);
         }
 
         #stage-right {
-            right: 20px;
+            right: 10px;
             bottom: 60%;
-            transform: translateY(50%);
-        }
-
-        .glass-wall {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%);
-            backdrop-filter: blur(5px);
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .textured-wall {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50px;
-            background: repeating-linear-gradient(45deg, #444, #444 10px, #555 10px, #555 20px);
+            transform: translateY(100%);
         }
 
         .control-panel-button {
@@ -311,136 +295,37 @@
             background: #444;
         }
 
-        .timeline-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 998;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .timeline-controls {
-            height: 30px;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            border-bottom: 1px solid #444;
-        }
-
-        .timeline-track {
-            flex-grow: 1;
-            position: relative;
-            overflow-x: auto;
-            overflow-y: hidden;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .timeline-grid {
+        .audience-label {
             position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .timeline-mark {
-            width: 50px;
-            height: 100%;
-            border-left: 1px solid #444;
-            display: flex;
-            align-items: flex-start;
-            padding-left: 5px;
-            color: #666;
-            font-size: 0.8em;
-        }
-
-        .playback-button {
-            background: none;
-            border: none;
+            bottom: -40px;  /* Changed from bottom: 10px to move it below the stage */
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin-right: 10px;
-        }
-
-        .playback-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-
-        .timeline-cursor {
-            position: absolute;
-            top: 0;
-            width: 2px;
-            height: 100%;
-            background: #fff;
-            pointer-events: none;
-        }
-
-        .scene-marker {
-            position: absolute;
-            width: 8px;
-            height: 30px;
-            background: #666;
-            border-radius: 2px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .scene-marker:hover {
-            background: #888;
-        }
-
-        .scene-marker.active {
-            background: #fff;
-        }
-
-        .time-display {
-            color: white;
-            margin-left: 10px;
-            font-family: monospace;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
         }
     </style>
 </head>
 <body>
-    <div class="timeline-container">
-        <div class="timeline-controls">
-            <button class="playback-button" id="playButton">▶</button>
-            <button class="playback-button" id="stopButton">⬛</button>
-            <span class="time-display">00:00</span>
-        </div>
-        <div class="timeline-track" id="timelineTrack">
-            <div class="timeline-grid" id="timelineGrid"></div>
-            <div class="timeline-cursor" id="timelineCursor"></div>
-        </div>
-    </div>
-
     <div class="stage-container">
-        <div class="glass-wall"></div>
         <div class="stage-floor">
             <!-- Spotlight Locations -->
-            <div class="spotlight-location" id="spotlight-1">8</div>
-            <div class="spotlight-location" id="spotlight-2">7</div>
-            <div class="spotlight-location" id="spotlight-3">6</div>
-            <div class="spotlight-location" id="spotlight-4">5</div>
-            <div class="spotlight-location" id="spotlight-5">4</div>
-            <div class="spotlight-location" id="spotlight-6">3</div>
-            <div class="spotlight-location" id="spotlight-7">2</div>
-            <div class="spotlight-location" id="spotlight-8">1</div>
+            <div class="spotlight-location" id="spotlight-1">1</div>
+            <div class="spotlight-location" id="spotlight-2">2</div>
+            <div class="spotlight-location" id="spotlight-3">3</div>
+            <div class="spotlight-location" id="spotlight-4">4</div>
+            <div class="spotlight-location" id="spotlight-5">5</div>
+            <div class="spotlight-location" id="spotlight-6">6</div>
+            <div class="spotlight-location" id="spotlight-7">7</div>
+            <div class="spotlight-location" id="spotlight-8">8</div>
         </div>
 
         <!-- Stage Labels -->
-        <div class="stage-label" id="stage-left">Stage Left</div>
-        <div class="stage-label" id="stage-right">Stage Right</div>
+        <div class="stage-label" id="stage-right">Stage Left</div>
+        <div class="stage-label" id="stage-left">Stage Right</div>
 
-        <div class="textured-wall"></div>
+        <div class="audience-label">Audience</div>
     </div>
     <button class="control-panel-button">Control Panel</button>
     <div class="control-panel">
@@ -458,42 +343,42 @@
         </div>
         <div class="slider-panel">
             <div class="slider-container">
-                <span class="slider-label">8</span>
+                <span class="slider-label">1</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="1">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">7</span>
+                <span class="slider-label">2</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="2">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">6</span>
+                <span class="slider-label">3</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="3">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">5</span>
+                <span class="slider-label">4</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="4">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">4</span>
+                <span class="slider-label">5</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="5">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">3</span>
+                <span class="slider-label">6</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="6">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">2</span>
+                <span class="slider-label">7</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="7">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
             <div class="slider-container">
-                <span class="slider-label">1</span>
+                <span class="slider-label">8</span>
                 <input type="range" min="0" max="10" value="10" class="spotlight-slider" data-spotlight="8">
                 <input type="number" min="0" max="10" value="10" class="brightness-input">
             </div>
@@ -842,109 +727,6 @@
         saveSceneBtn.onclick = saveScene;
 
         updateScenesList();
-
-        const timelineGrid = document.getElementById('timelineGrid');
-        const timelineCursor = document.getElementById('timelineCursor');
-        const playButton = document.getElementById('playButton');
-        const stopButton = document.getElementById('stopButton');
-        const timeDisplay = document.querySelector('.time-display');
-        const timelineTrack = document.querySelector('.timeline-track');
-
-        let isPlaying = false;
-        let currentTime = 0;
-        let animationFrame;
-        const TIMELINE_DURATION = 300;
-        const MARKS_INTERVAL = 5;
-
-        for (let i = 0; i <= TIMELINE_DURATION; i += MARKS_INTERVAL) {
-            const mark = document.createElement('div');
-            mark.className = 'timeline-mark';
-            mark.style.left = `${(i / TIMELINE_DURATION) * 100}%`;
-            mark.textContent = `${Math.floor(i / 60)}:${(i % 60).toString().padStart(2, '0')}`;
-            timelineGrid.appendChild(mark);
-        }
-
-        function updateTimeDisplay(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
-        function updateCursor(seconds) {
-            const position = (seconds / TIMELINE_DURATION) * timelineTrack.clientWidth;
-            timelineCursor.style.left = `${position}px`;
-            updateTimeDisplay(seconds);
-        }
-
-        let lastTimestamp = 0;
-        function animate(timestamp) {
-            if (!lastTimestamp) lastTimestamp = timestamp;
-            const delta = (timestamp - lastTimestamp) / 1000;
-            lastTimestamp = timestamp;
-
-            currentTime += delta;
-            if (currentTime >= TIMELINE_DURATION) {
-                stopPlayback();
-                return;
-            }
-
-            updateCursor(currentTime);
-            if (isPlaying) {
-                animationFrame = requestAnimationFrame(animate);
-            }
-        }
-
-        function togglePlayback() {
-            isPlaying = !isPlaying;
-            playButton.textContent = isPlaying ? '⏸' : '▶';
-            
-            if (isPlaying) {
-                lastTimestamp = 0;
-                animationFrame = requestAnimationFrame(animate);
-            } else {
-                cancelAnimationFrame(animationFrame);
-            }
-        }
-
-        function stopPlayback() {
-            isPlaying = false;
-            playButton.textContent = '▶';
-            cancelAnimationFrame(animationFrame);
-            currentTime = 0;
-            updateCursor(currentTime);
-            lastTimestamp = 0;
-        }
-
-        playButton.addEventListener('click', togglePlayback);
-        stopButton.addEventListener('click', stopPlayback);
-
-        timelineTrack.addEventListener('click', (e) => {
-            const rect = timelineTrack.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            currentTime = (x / timelineTrack.clientWidth) * TIMELINE_DURATION;
-            updateCursor(currentTime);
-        });
-
-        updateCursor(0);
-
-        const originalUpdateScenesList = updateScenesList;
-        updateScenesList = function() {
-            originalUpdateScenesList();
-            
-            const existingMarkers = timelineTrack.querySelectorAll('.scene-marker');
-            existingMarkers.forEach(marker => marker.remove());
-
-            Object.keys(scenes).forEach((sceneName, index) => {
-                const marker = document.createElement('div');
-                marker.className = 'scene-marker';
-                marker.title = sceneName;
-                const position = (index / (Object.keys(scenes).length - 1 || 1)) * 100;
-                marker.style.left = `${position}%`;
-                timelineTrack.appendChild(marker);
-
-                marker.addEventListener('click', () => loadScene(sceneName));
-            });
-        };
     </script>
     <script src="timeline.js"></script>
 </body>
