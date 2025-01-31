@@ -381,6 +381,9 @@
             <div class="scene-controls">
                 <button class="scene-button" id="createScene">Create</button>
                 <button class="scene-button" id="saveScene" disabled>Save</button>
+                <button class="scene-button" id="exportScenes">Export</button>
+                <button class="scene-button" id="importScenes">Import</button>
+                <input type="file" id="importFile" class="hidden-file-input" accept=".json">
             </div>
         </div>
         <div class="slider-panel">
@@ -472,6 +475,9 @@
         const renameSceneBtn = document.getElementById('renameScene');
         const deleteSceneBtn = document.getElementById('deleteScene');
         const duplicateSceneBtn = document.getElementById('duplicateScene');
+        const exportScenesBtn = document.getElementById('exportScenes');
+        const importScenesBtn = document.getElementById('importScenes');
+        const importFile = document.getElementById('importFile');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
         let currentScene = null;
@@ -706,6 +712,82 @@
             currentScene = sceneName;
             updateScenesList();
         }
+
+        // Add export/import functions
+        function exportScenes() {
+            const scenesData = {
+                scenes: scenes,
+                exportDate: new Date().toISOString(),
+                version: "1.0"
+            };
+
+            const blob = new Blob([JSON.stringify(scenesData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importScenes(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.scenes || !data.version) {
+                        throw new Error('Invalid file format');
+                    }
+
+                    const importedScenes = data.scenes;
+                    const sceneNames = Object.keys(importedScenes);
+                    
+                    if (sceneNames.length === 0) {
+                        alert('No scenes found in file');
+                        return;
+                    }
+
+                    // Validate all values are 1-10
+                    for (const sceneName of sceneNames) {
+                        const sceneData = importedScenes[sceneName];
+                        for (const key in sceneData) {
+                            sceneData[key] = Math.min(10, Math.max(1, sceneData[key]));
+                        }
+                    }
+
+                    const existingNames = Object.keys(scenes).filter(name => 
+                        sceneNames.includes(name)
+                    );
+
+                    if (existingNames.length > 0) {
+                        if (!confirm(`The following scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
+                            return;
+                        }
+                    }
+
+                    scenes = { ...scenes, ...importedScenes };
+                    localStorage.setItem('scenes', JSON.stringify(scenes));
+                    updateScenesList();
+                    alert(`Successfully imported ${sceneNames.length} scenes`);
+                } catch (error) {
+                    alert('Error importing scenes: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
+
+        // Add event listeners for export/import
+        exportScenesBtn.onclick = exportScenes;
+        importScenesBtn.onclick = () => importFile.click();
+        importFile.onchange = importScenes;
 
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
