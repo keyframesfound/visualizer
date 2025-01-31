@@ -130,7 +130,7 @@
         /* Control Panel Styles */
         .control-panel-button {
             position: fixed;
-            bottom: 20px;  /* Changed from top to bottom */
+            bottom: 220px;  /* Moved up to match new panel position */
             right: 20px;
             padding: 10px 20px;
             background: #444;
@@ -158,7 +158,7 @@
         }
 
         .control-panel.open {
-            bottom: 0;  /* Changed from right to bottom */
+            bottom: 200px;  /* Changed to show panel higher up */
         }
 
         .scene-manager {
@@ -293,7 +293,6 @@
                 <!-- Scenes will be added here dynamically -->
             </div>
             <div class="scene-controls">
-                <button class="scene-button" id="newScene">New Scene</button>
                 <button class="scene-button" id="saveScene">Save Scene</button>
             </div>
         </div>
@@ -353,7 +352,6 @@
 
         // Scene Management
         const sceneList = document.getElementById('sceneList');
-        const newSceneBtn = document.getElementById('newScene');
         const saveSceneBtn = document.getElementById('saveScene');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
@@ -399,17 +397,6 @@
             updateScenesList();
         }
 
-        function createNewScene() {
-            sliders.forEach(slider => {
-                slider.value = 100;
-                const event = new Event('input');
-                slider.dispatchEvent(event);
-            });
-            currentScene = null;
-            updateScenesList();
-        }
-
-        newSceneBtn.onclick = createNewScene;
         saveSceneBtn.onclick = saveScene;
 
         // Initial render
