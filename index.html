@@ -456,7 +456,6 @@
             <button class="playback-button" id="playButton">▶</button>
             <button class="playback-button" id="stopButton">⬛</button>
             <span class="time-display">00:00</span>
-            <button id="addSceneButton">Add Scene</button>
         </div>
         <div class="timeline-track" id="timelineTrack">
             <div class="timeline-grid" id="timelineGrid"></div>
@@ -1019,11 +1018,5 @@
         };
     </script>
     <script src="timeline.js"></script>
-    <script>
-        const timeline = new Timeline();
-        document.getElementById('addSceneButton').addEventListener('click', () => {
-            timeline.addScene();
-        });
-    </script>
 </body>
 </html>
