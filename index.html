@@ -844,9 +844,37 @@
             let initialX;
             let initialY;
             
+            // Mouse events
             element.addEventListener('mousedown', startDragging);
             document.addEventListener('mousemove', drag);
             document.addEventListener('mouseup', stopDragging);
+            
+            // Touch events
+            element.addEventListener('touchstart', handleTouchStart);
+            document.addEventListener('touchmove', handleTouchMove);
+            document.addEventListener('touchend', handleTouchEnd);
+            
+            function handleTouchStart(e) {
+                const touch = e.touches[0];
+                initialX = touch.clientX - element.offsetLeft;
+                initialY = touch.clientY - element.offsetTop;
+                isDragging = true;
+            }
+            
+            function handleTouchMove(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    currentX = touch.clientX - initialX;
+                    currentY = touch.clientY - initialY;
+                    element.style.left = `${currentX}px`;
+                    element.style.top = `${currentY}px`;
+                }
+            }
+            
+            function handleTouchEnd() {
+                isDragging = false;
+            }
             
             function startDragging(e) {
                 initialX = e.clientX - element.offsetLeft;
@@ -948,25 +976,35 @@
         updateScenesList();
 
         document.querySelectorAll('.prop-item').forEach(prop => {
-            prop.addEventListener('mousedown', (e) => {
+            const createProp = (clientX, clientY) => {
                 const type = prop.dataset.prop;
                 const stageProp = document.createElement('div');
                 stageProp.className = `stage-prop prop-${type}`;
                 
-                // Get stage floor position and dimensions
                 const stageFloor = document.querySelector('.stage-floor');
                 const stageRect = stageFloor.getBoundingClientRect();
                 
-                // Calculate center position of stage, placing it higher up
+                // Calculate center position of stage
                 const centerX = stageRect.left + (stageRect.width / 2);
-                const centerY = stageRect.top + (stageRect.height / 3); // Changed from /2 to /3 to spawn higher
+                const centerY = stageRect.top + (stageRect.height / 3);
                 
-                // Position prop at stage center
                 stageProp.style.left = `${centerX}px`;
                 stageProp.style.top = `${centerY}px`;
                 
                 stageFloor.appendChild(stageProp);
                 makeElementDraggable(stageProp);
+            };
+
+            // Mouse event
+            prop.addEventListener('mousedown', (e) => {
+                createProp(e.clientX, e.clientY);
+            });
+
+            // Touch event
+            prop.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent duplicate events
+                const touch = e.touches[0];
+                createProp(touch.clientX, touch.clientY);
             });
         });
 
@@ -989,12 +1027,12 @@
                     propCounts[type] = (propCounts[type] || 0) + 1;
                 });
                 
-                // Create PDF in portrait orientation
+                // Create PDF in portrait orientation with more space for inventory
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'px',
-                    format: [canvas.width, canvas.height + 200] // More space for inventory
+                    format: [canvas.width, canvas.height + 400] // Doubled space for inventory
                 });
                 
                 // Scale down the image to fit portrait orientation
@@ -1012,20 +1050,20 @@
                 );
                 
                 // Add inventory count with larger font
-                pdf.setFontSize(24); // Increased font size
+                pdf.setFontSize(36); // Increased from 24
                 pdf.setFont("helvetica", "bold");
-                pdf.text('Stage Layout Inventory:', 20, scaledHeight + 40);
+                pdf.text('Stage Layout Inventory:', 20, scaledHeight + 60); // Increased spacing
                 
-                pdf.setFontSize(18); // Slightly smaller for inventory items
+                pdf.setFontSize(28); // Increased from 18
                 pdf.setFont("helvetica", "normal");
-                let yPos = scaledHeight + 70;
+                let yPos = scaledHeight + 120; // Increased initial spacing
                 for (const [prop, count] of Object.entries(propCounts)) {
                     // Format prop name to be more readable
                     const propName = prop.split('-').map(word => 
                         word.charAt(0).toUpperCase() + word.slice(1)
                     ).join(' ');
-                    pdf.text(`${propName}: ${count}`, 20, yPos);
-                    yPos += 30;
+                    pdf.text(`${propName}: ${count}`, 40, yPos); // Increased left margin
+                    yPos += 50; // Increased spacing between items
                 }
                 
                 // Save the PDF
