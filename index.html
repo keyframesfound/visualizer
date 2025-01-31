@@ -32,14 +32,15 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
+            padding: 0 20px;
         }
 
         /* Spotlight Locations */
         .spotlight-location {
-            width: 80px; /* Larger radius */
-            height: 80px;
-            background: rgba(255, 255, 255, 0.3); /* White and transparent */
-            border: 2px solid rgba(255, 255, 255, 0.8); /* White border */
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -51,20 +52,28 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            margin: 0 -5px;
         }
 
         .spotlight-location:hover {
-            background: rgba(255, 255, 255, 0.5); /* More opaque on hover */
+            background: rgba(255, 255, 255, 0.5);
             transform: scale(1.1);
+            z-index: 1;
         }
 
         /* Overlap for spotlights 4 and 5 */
         #spotlight-4 {
-            left: -20px; /* Shift left to overlap */
+            margin-right: -80px; /* Significant overlap */
+            z-index: 2; /* Place above spotlight 5 */
         }
 
         #spotlight-5 {
-            left: 20px; /* Shift right to overlap */
+            margin-left: -80px; /* Significant overlap */
+        }
+
+        /* Other spotlights shouldn't overlap */
+        #spotlight-1, #spotlight-2, #spotlight-3, #spotlight-6, #spotlight-7, #spotlight-8 {
+            margin: 0 -5px;
         }
 
         /* Stage Labels */
@@ -78,13 +87,13 @@
 
         #stage-left {
             left: 20px;
-            bottom: 50%;
+            bottom: 60%;
             transform: translateY(50%);
         }
 
         #stage-right {
             right: 20px;
-            bottom: 50%;
+            bottom: 60%;
             transform: translateY(50%);
         }
 
