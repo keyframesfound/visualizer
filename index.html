@@ -127,6 +127,71 @@
             );
         }
 
+        /* Control Panel Styles */
+        .control-panel-button {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            padding: 10px 20px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .control-panel {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
+        }
+
+        .control-panel.open {
+            right: 0;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .slider-container input[type="range"] {
+            writing-mode: bt-lr;
+            -webkit-appearance: none;
+            width: 150px;
+            height: 4px;
+            background: #555;
+            transform: rotate(270deg);
+            transform-origin: right;
+            margin-right: -75px;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-label {
+            width: 30px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -150,5 +215,59 @@
 
         <div class="textured-wall"></div>
     </div>
+    <button class="control-panel-button">Control Panel</button>
+    <div class="control-panel">
+        <div class="slider-container">
+            <span class="slider-label">1</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="1">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">2</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="2">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">3</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="3">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">4</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="4">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">5</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="5">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">6</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="6">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">7</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="7">
+        </div>
+        <div class="slider-container">
+            <span class="slider-label">8</span>
+            <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="8">
+        </div>
+    </div>
+
+    <script>
+        const controlPanelButton = document.querySelector('.control-panel-button');
+        const controlPanel = document.querySelector('.control-panel');
+        const sliders = document.querySelectorAll('.spotlight-slider');
+
+        controlPanelButton.addEventListener('click', () => {
+            controlPanel.classList.toggle('open');
+        });
+
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const spotlightNum = e.target.dataset.spotlight;
+                const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
+                const opacity = e.target.value / 100;
+                spotlight.style.opacity = opacity;
+            });
+        });
+    </script>
 </body>
 </html>
