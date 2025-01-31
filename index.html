@@ -302,6 +302,7 @@
             <div class="scene-controls">
                 <button class="scene-button" id="createScene">Create</button>
                 <button class="scene-button" id="saveScene" disabled>Save</button>
+                <button class="scene-button" id="duplicateScene">Duplicate</button>
                 <button class="scene-button" id="renameScene">Rename</button>
                 <button class="scene-button" id="deleteScene">Delete</button>
             </div>
@@ -366,6 +367,7 @@
         const saveSceneBtn = document.getElementById('saveScene');
         const renameSceneBtn = document.getElementById('renameScene');
         const deleteSceneBtn = document.getElementById('deleteScene');
+        const duplicateSceneBtn = document.getElementById('duplicateScene');
         
         let scenes = JSON.parse(localStorage.getItem('scenes') || '{}');
         let currentScene = null;
@@ -496,10 +498,34 @@
             updateScenesList();
         }
 
+        function duplicateScene() {
+            if (!currentScene) {
+                alert('Please select a scene first');
+                return;
+            }
+            
+            const baseName = currentScene;
+            let newName = `${baseName} (copy)`;
+            let counter = 1;
+            
+            // Find an available name if the copy name already exists
+            while (scenes[newName]) {
+                counter++;
+                newName = `${baseName} (copy ${counter})`;
+            }
+            
+            // Copy the scene data
+            scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
+            localStorage.setItem('scenes', JSON.stringify(scenes));
+            currentScene = newName;
+            updateScenesList();
+        }
+
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
         deleteSceneBtn.onclick = deleteScene;
         renameSceneBtn.onclick = renameScene;
+        duplicateSceneBtn.onclick = duplicateScene;
 
         // Initial render
         updateScenesList();
