@@ -775,10 +775,10 @@
             // Update pagination controls
             document.getElementById('currentPage').textContent = currentPage;
             document.getElementById('prevPage').disabled = currentPage <= 1;
-            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages && currentScenes.length >= 4;
             
-            // Update create button state
-            createSceneBtn.disabled = currentScenes.length >= 4 && currentPage === totalPages;
+            // Always enable create button - removed the disable condition
+            createSceneBtn.disabled = false;
             
             currentScenes.forEach(sceneName => {
                 const sceneDiv = document.createElement('div');
@@ -958,10 +958,15 @@
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = sceneName;
 
-            // Calculate if we need to move to a new page
+            // Calculate total scenes and adjust current page
             const totalScenes = Object.keys(scenes).length;
-            const totalPages = Math.ceil(totalScenes / scenesPerPage);
-            currentPage = Math.ceil(totalScenes / scenesPerPage);
+            const newPage = Math.ceil(totalScenes / scenesPerPage);
+            
+            // Move to new page if current page is full
+            const currentPageScenes = Object.keys(scenes).slice((currentPage - 1) * scenesPerPage, currentPage * scenesPerPage);
+            if (currentPageScenes.length >= 4) {
+                currentPage = newPage;
+            }
             
             updateScenesList();
         }
