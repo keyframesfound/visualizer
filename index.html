@@ -702,6 +702,12 @@
             sceneList.innerHTML = '';
             saveSceneBtn.disabled = !currentScene;
             
+            // Update create button state based on scene count
+            const sceneCount = Object.keys(scenes).length;
+            createSceneBtn.disabled = sceneCount >= 4;
+            createSceneBtn.title = sceneCount >= 4 ? 'Maximum scenes limit reached' : '';
+            
+            // ...rest of existing updateScenesList function...
             Object.keys(scenes).forEach(sceneName => {
                 const sceneDiv = document.createElement('div');
                 sceneDiv.className = 'scene-item';
@@ -829,6 +835,12 @@
                 localStorage.setItem('scenes', JSON.stringify(scenes));
                 currentScene = null;
                 updateScenesList();
+                
+                // Re-enable create button if we're below the limit
+                if (Object.keys(scenes).length < 4) {
+                    createSceneBtn.disabled = false;
+                    createSceneBtn.title = '';
+                }
             }
         }
 
@@ -857,6 +869,12 @@
         }
 
         function createScene() {
+            const sceneCount = Object.keys(scenes).length;
+            if (sceneCount >= 4) {
+                alert('Maximum limit of 4 scenes reached. Please delete a scene before creating a new one.');
+                return;
+            }
+
             const sceneName = prompt('Enter scene name:');
             if (!sceneName) return;
             if (scenes[sceneName]) {
@@ -868,6 +886,12 @@
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = sceneName;
             updateScenesList();
+            
+            // Disable create button if limit reached
+            if (Object.keys(scenes).length >= 4) {
+                createSceneBtn.disabled = true;
+                createSceneBtn.title = 'Maximum scenes limit reached';
+            }
         }
 
         function saveScene() {
