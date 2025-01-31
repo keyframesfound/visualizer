@@ -68,7 +68,7 @@
             max-width: 1300px;
             height: 60vh;  /* Changed from fixed height to viewport height */
             max-height: 600px;
-            margin-top: -20vh;  /* Adjusted for viewport height */
+            margin-top: -50vh;  /* Changed from -20vh to move stage higher up */
             perspective: 1000px;
         }
 
@@ -515,17 +515,10 @@
 
         @media (orientation: landscape) and (max-height: 600px) {
             .stage-container {
-                margin-top: -10vh;
+                margin-top: -30vh;  /* Adjusted for landscape mode */
                 height: 50vh;
             }
-
-            .props-panel {
-                flex-direction: row;
-                top: auto;
-                bottom: 80px;
-                transform: none;
-                width: auto;
-            }
+            // ...rest of media query...
         }
     </style>
     
