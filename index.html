@@ -487,12 +487,15 @@
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'scene-name';
                 nameSpan.textContent = sceneName;
-                nameSpan.onclick = () => loadScene(sceneName);
+                // Remove the onclick from nameSpan and add it to sceneDiv
                 
                 const moreButton = document.createElement('span');
                 moreButton.className = 'more-options';
                 moreButton.textContent = '•••';
-                moreButton.onclick = (e) => showDropdownMenu(e, sceneName);
+                moreButton.onclick = (e) => {
+                    e.stopPropagation();
+                    showDropdownMenu(e, sceneName);
+                };
                 
                 if (currentScene === sceneName) {
                     sceneDiv.classList.add('active');
@@ -500,15 +503,14 @@
                 
                 sceneDiv.appendChild(nameSpan);
                 sceneDiv.appendChild(moreButton);
+                sceneDiv.onclick = () => loadScene(sceneName); // Move click handler here
                 sceneList.appendChild(sceneDiv);
             });
         }
 
-        // Add new dropdown menu functions
         function showDropdownMenu(event, sceneName) {
-            event.stopPropagation(); // Prevent scene selection
+            event.stopPropagation();
             
-            // Remove any existing dropdown
             const existing = document.querySelector('.dropdown-menu');
             if (existing) existing.remove();
             
@@ -526,14 +528,14 @@
                 div.className = 'dropdown-item';
                 div.textContent = item.text;
                 div.onclick = (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
-                    currentScene = sceneName;
                     item.action();
                     dropdown.remove();
                 };
                 dropdown.appendChild(div);
             });
-            
+
             // Position dropdown next to the more button
             const rect = event.target.getBoundingClientRect();
             const spaceBelow = window.innerHeight - rect.bottom;
