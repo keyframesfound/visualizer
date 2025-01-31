@@ -520,127 +520,6 @@
             }
             // ...rest of media query...
         }
-
-        /* Timeline Styles */
-        .timeline-container {
-            position: fixed;
-            bottom: 60px;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 996;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .timeline-controls {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #444;
-        }
-
-        .timeline-controls button {
-            background: #444;
-            color: white;
-            border: none;
-            padding: 5px 15px;
-            margin: 0 5px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .timeline-controls button:hover {
-            background: #555;
-        }
-
-        .timeline-controls .time-display {
-            color: white;
-            margin: 0 15px;
-            font-family: monospace;
-        }
-
-        .timeline-track {
-            flex: 1;
-            position: relative;
-            overflow-x: auto;
-            overflow-y: hidden;
-            background: #222;
-            display: flex;
-            align-items: stretch;
-        }
-
-        .timeline-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-size: 100px 100%;
-            background-image: linear-gradient(to right, #333 1px, transparent 1px);
-        }
-
-        .timeline-clips {
-            position: relative;
-            height: 100%;
-            min-width: 100%;
-        }
-
-        .timeline-clip {
-            position: absolute;
-            height: 80px;
-            top: 10px;
-            background: #444;
-            border: 1px solid #666;
-            border-radius: 3px;
-            cursor: move;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 100px;
-        }
-
-        .timeline-clip .clip-label {
-            color: white;
-            padding: 5px;
-            pointer-events: none;
-        }
-
-        .playhead {
-            position: absolute;
-            top: 0;
-            width: 2px;
-            height: 100%;
-            background: red;
-            z-index: 1;
-        }
-
-        .audio-upload {
-            display: flex;
-            align-items: center;
-            margin-left: 20px;
-        }
-
-        .audio-upload input {
-            display: none;
-        }
-
-        .audio-upload label {
-            color: white;
-            padding: 5px 10px;
-            background: #444;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .waveform {
-            position: absolute;
-            width: 100%;
-            height: 40px;
-            bottom: 0;
-            opacity: 0.3;
-        }
     </style>
     
     <!-- Add these scripts in the head section -->
@@ -755,25 +634,6 @@
                 🎙️
                 <small><Cap></Cap>Condenser</small>
             </div>
-        </div>
-    </div>
-
-    <!-- Add before the control panel -->
-    <div class="timeline-container">
-        <div class="timeline-controls">
-            <button id="playPauseBtn">Play</button>
-            <button id="stopBtn">Stop</button>
-            <span class="time-display">00:00.000</span>
-            <div class="audio-upload">
-                <input type="file" id="audioUpload" accept="audio/*">
-                <label for="audioUpload">Upload Audio</label>
-            </div>
-        </div>
-        <div class="timeline-track">
-            <div class="timeline-grid"></div>
-            <div class="playhead"></div>
-            <div class="timeline-clips"></div>
-            <canvas class="waveform"></canvas>
         </div>
     </div>
 
@@ -1326,6 +1186,5 @@
         // Add click handler for PDF export button
         document.querySelector('.export-pdf-button').addEventListener('click', exportLayoutPDF);
     </script>
-    <script src="timeline.js"></script>
 </body>
 </html>
