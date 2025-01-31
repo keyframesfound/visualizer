@@ -143,10 +143,10 @@
 
         .control-panel {
             position: fixed;
-            bottom: -120px;  /* Changed from right to bottom */
+            bottom: -200px;  /* Increased height */
             left: 0;
             width: 100%;
-            height: 120px;
+            height: 200px; /* Increased height for vertical sliders */
             background: rgba(0, 0, 0, 0.9);
             padding: 20px;
             box-sizing: border-box;
@@ -165,29 +165,28 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 120px;
-            height: 80px;
+            width: 60px;
+            height: 160px;
             position: relative;
-            margin: 0 10px;
+            margin: 0 15px;
         }
 
         .slider-container input[type="range"] {
-            position: relative;
+            position: absolute;
             -webkit-appearance: none;
-            width: 100px;
+            width: 150px;
             height: 4px;
             background: #555;
-            margin: 10px 0;
-            transform: none;  /* Remove rotation */
+            transform: rotate(270deg) translateX(-65px);
+            transform-origin: right;
+            top: 50%;
         }
 
         .slider-label {
-            position: relative;
+            position: absolute;
+            bottom: 0;
             color: white;
             text-align: center;
-            transform: none;
-            right: 0;
-            top: 0;
         }
     </style>
 </head>
@@ -215,35 +214,35 @@
     <button class="control-panel-button">Control Panel</button>
     <div class="control-panel">
         <div class="slider-container">
-            <span class="slider-label">1</span>
+            <span class="slider-label">8</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="1">
         </div>
         <div class="slider-container">
-            <span class="slider-label">2</span>
+            <span class="slider-label">7</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="2">
         </div>
         <div class="slider-container">
-            <span class="slider-label">3</span>
+            <span class="slider-label">6</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="3">
         </div>
         <div class="slider-container">
-            <span class="slider-label">4</span>
+            <span class="slider-label">5</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="4">
         </div>
         <div class="slider-container">
-            <span class="slider-label">5</span>
+            <span class="slider-label">4</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="5">
         </div>
         <div class="slider-container">
-            <span class="slider-label">6</span>
+            <span class="slider-label">3</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="6">
         </div>
         <div class="slider-container">
-            <span class="slider-label">7</span>
+            <span class="slider-label">2</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="7">
         </div>
         <div class="slider-container">
-            <span class="slider-label">8</span>
+            <span class="slider-label">1</span>
             <input type="range" min="0" max="100" value="100" class="spotlight-slider" data-spotlight="8">
         </div>
     </div>
