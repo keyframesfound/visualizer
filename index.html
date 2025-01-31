@@ -550,7 +550,12 @@
             sceneList.innerHTML = '';
             saveSceneBtn.disabled = !currentScene;
             
-            Object.keys(scenes).forEach(sceneName => {
+            // Clear existing timeline markers
+            const existingMarkers = timelineTrack.querySelectorAll('.scene-marker');
+            existingMarkers.forEach(marker => marker.remove());
+            
+            Object.keys(scenes).forEach((sceneName, index) => {
+                // Create scene list item
                 const sceneDiv = document.createElement('div');
                 sceneDiv.className = 'scene-item';
                 
@@ -574,6 +579,16 @@
                 sceneDiv.appendChild(moreButton);
                 sceneDiv.onclick = () => loadScene(sceneName);
                 sceneList.appendChild(sceneDiv);
+
+                // Create timeline marker
+                const marker = document.createElement('div');
+                marker.className = 'scene-marker';
+                marker.title = sceneName;
+                const position = (index / (Object.keys(scenes).length - 1 || 1)) * 100;
+                marker.style.left = `${position}%`;
+                timelineTrack.appendChild(marker);
+
+                marker.addEventListener('click', () => loadScene(sceneName));
             });
         }
 
@@ -926,26 +941,6 @@
         });
 
         updateCursor(0);
-
-        const originalUpdateScenesList = updateScenesList;
-        updateScenesList = function() {
-            originalUpdateScenesList();
-            
-            const existingMarkers = timelineTrack.querySelectorAll('.scene-marker');
-            existingMarkers.forEach(marker => marker.remove());
-
-            Object.keys(scenes).forEach((sceneName, index) => {
-                const marker = document.createElement('div');
-                marker.className = 'scene-marker';
-                marker.title = sceneName;
-                const position = (index / (Object.keys(scenes).length - 1 || 1)) * 100;
-                marker.style.left = `${position}%`;
-                timelineTrack.appendChild(marker);
-
-                marker.addEventListener('click', () => loadScene(sceneName));
-            });
-        };
     </script>
-    <script src="timeline.js"></script>
 </body>
 </html>
