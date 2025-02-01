@@ -525,7 +525,6 @@
                 margin-top: -30vh;  /* Adjusted for landscape mode */
                 height: 50vh;
             }
-            // ...rest of media query...
         }
 
         .pagination-controls {
@@ -627,6 +626,33 @@
 
         .scene-name {
             flex-grow: 1;
+        }
+
+        .trash-bin {
+            position: fixed;
+            bottom: 73%;  /* Changed from bottom: 20px */
+            left: 50px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px dashed #ff0000;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: translateY(50%);  /* Added to center vertically */
+        }
+
+        .trash-bin.drag-over {
+            background: rgba(255, 0, 0, 0.4);
+            transform: scale(1.1);
+        }
+
+        .trash-bin.hidden {
+            display: none;
         }
     </style>
     
@@ -763,6 +789,8 @@
             </div>
         </div>
     </div>
+
+    <div class="trash-bin hidden" id="trashBin">🗑️</div>
 
     <script src="dragndrop.js"></script>
     <script>
@@ -1168,6 +1196,7 @@
                 initialX = touch.clientX - element.offsetLeft;
                 initialY = touch.clientY - element.offsetTop;
                 isDragging = true;
+                handleDragStart();
             }
             
             function handleTouchMove(e) {
@@ -1178,10 +1207,15 @@
                     currentY = touch.clientY - initialY;
                     element.style.left = `${currentX}px`;
                     element.style.top = `${currentY}px`;
+                    handleDrag(touch.clientX, touch.clientY);
                 }
             }
             
-            function handleTouchEnd() {
+            function handleTouchEnd(e) {
+                if (isDragging) {
+                    const touch = e.changedTouches[0];
+                    handleDragEnd(touch.clientX, touch.clientY);
+                }
                 isDragging = false;
             }
             
@@ -1189,6 +1223,7 @@
                 initialX = e.clientX - element.offsetLeft;
                 initialY = e.clientY - element.offsetTop;
                 isDragging = true;
+                handleDragStart();
             }
             
             function drag(e) {
@@ -1198,11 +1233,56 @@
                     currentY = e.clientY - initialY;
                     element.style.left = `${currentX}px`;
                     element.style.top = `${currentY}px`;
+                    handleDrag(e.clientX, e.clientY);
                 }
             }
             
-            function stopDragging() {
+            function stopDragging(e) {
+                if (isDragging) {
+                    handleDragEnd(e.clientX, e.clientY);
+                }
                 isDragging = false;
+            }
+
+            const trashBin = document.getElementById('trashBin');
+        
+            function showTrashBin() {
+                trashBin.classList.remove('hidden');
+            }
+            
+            function hideTrashBin() {
+                trashBin.classList.remove('drag-over');
+                trashBin.classList.add('hidden');
+            }
+
+            function handleDragStart() {
+                showTrashBin();
+            }
+
+            function handleDrag(x, y) {
+                const trashRect = trashBin.getBoundingClientRect();
+                const isOverTrash = x >= trashRect.left && x <= trashRect.right && 
+                                  y >= trashRect.top && y <= trashRect.bottom;
+                
+                if (isOverTrash) {
+                    trashBin.classList.add('drag-over');
+                } else {
+                    trashBin.classList.remove('drag-over');
+                }
+            }
+
+            function handleDragEnd(x, y) {
+                const trashRect = trashBin.getBoundingClientRect();
+                const isOverTrash = x >= trashRect.left && x <= trashRect.right && 
+                                  y >= trashRect.top && y <= trashRect.bottom;
+                
+                if (isOverTrash) {
+                    element.remove();
+                    if (currentScene) {
+                        saveSceneBtn.disabled = false;
+                    }
+                }
+                hideTrashBin();
             }
         }
 
