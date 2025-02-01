@@ -595,15 +595,6 @@
             color: white;
         }
 
-        .autoplay-settings input[type="number"] {
-            width: 50px;
-            padding: 4px;
-            background: #444;
-            border: 1px solid #666;
-            color: white;
-            border-radius: 3px;
-        }
-
         .autoplay-settings label {
             display: flex;
             align-items: center;
@@ -683,10 +674,6 @@
                     <div class="autoplay-controls">
                         <button class="autoplay-button">Autoplay</button>
                         <div class="autoplay-settings">
-                            <label>
-                                Transition (sec):
-                                <input type="number" id="transition-time" min="1" max="60" value="5">
-                            </label>
                             <label>
                                 <input type="checkbox" id="loop-autoplay" checked>
                                 Loop
@@ -1525,7 +1512,6 @@
         // Save autoplay settings to localStorage
         function saveAutoplaySettings() {
             const settings = {
-                transitionTime: document.getElementById('transition-time').value,
                 loopEnabled: document.getElementById('loop-autoplay').checked
             };
             localStorage.setItem('autoplaySettings', JSON.stringify(settings));
@@ -1533,13 +1519,11 @@
 
         // Load autoplay settings from localStorage
         function loadAutoplaySettings() {
-            const settings = JSON.parse(localStorage.getItem('autoplaySettings') || '{"transitionTime": 5, "loopEnabled": true}');
-            document.getElementById('transition-time').value = settings.transitionTime;
+            const settings = JSON.parse(localStorage.getItem('autoplaySettings') || '{"loopEnabled": true}');
             document.getElementById('loop-autoplay').checked = settings.loopEnabled;
         }
 
         // Add event listeners for settings changes
-        document.getElementById('transition-time').addEventListener('change', saveAutoplaySettings);
         document.getElementById('loop-autoplay').addEventListener('change', saveAutoplaySettings);
 
         // Load settings when page loads
