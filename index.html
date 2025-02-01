@@ -567,6 +567,76 @@
             height: calc(100% - 60px); /* Adjusted for better spacing */
             overflow: hidden;  /* Added */
         }
+
+        .autoplay-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .autoplay-button {
+            padding: 8px 15px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .autoplay-button.playing {
+            background: #666;
+        }
+
+        .autoplay-settings {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .autoplay-settings input[type="number"] {
+            width: 50px;
+            padding: 4px;
+            background: #444;
+            border: 1px solid #666;
+            color: white;
+            border-radius: 3px;
+        }
+
+        .autoplay-settings label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Highlight active scene during autoplay */
+        .scene-item.autoplay-active {
+            background: #557;
+            border-color: #779;
+        }
+
+        .scene-transition {
+            color: #aaa;
+            font-size: 0.8em;
+            margin: 0 8px;
+        }
+
+        .scene-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #444;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .scene-name {
+            flex-grow: 1;
+        }
     </style>
     
     <!-- Add these scripts in the head section -->
@@ -609,6 +679,20 @@
             <div class="scene-manager">
                 <div class="control-buttons">
                     <button class="export-pdf-button">Export Layout PDF</button>
+                    <!-- Add autoplay controls -->
+                    <div class="autoplay-controls">
+                        <button class="autoplay-button">Autoplay</button>
+                        <div class="autoplay-settings">
+                            <label>
+                                Transition (sec):
+                                <input type="number" id="transition-time" min="1" max="60" value="5">
+                            </label>
+                            <label>
+                                <input type="checkbox" id="loop-autoplay" checked>
+                                Loop
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <!-- Add a container for the scrollable scene list -->
                 <div class="scene-list-container">
@@ -788,6 +872,11 @@
                 nameSpan.className = 'scene-name';
                 nameSpan.textContent = sceneName;
                 
+                // Add transition time display
+                const transitionSpan = document.createElement('span');
+                transitionSpan.className = 'scene-transition';
+                transitionSpan.textContent = `${scenes[sceneName].transitionTime || 5}s`;
+                
                 const moreButton = document.createElement('span');
                 moreButton.className = 'more-options';
                 moreButton.textContent = '•••';
@@ -801,6 +890,7 @@
                 }
                 
                 sceneDiv.appendChild(nameSpan);
+                sceneDiv.appendChild(transitionSpan);
                 sceneDiv.appendChild(moreButton);
                 sceneDiv.onclick = () => loadScene(sceneName);
                 sceneList.appendChild(sceneDiv);
@@ -817,6 +907,7 @@
             dropdown.className = 'dropdown-menu show';
             
             const items = [
+                { text: 'Set Transition', action: () => setSceneTransition(sceneName) },
                 { text: 'Duplicate', action: () => duplicateScene(sceneName) },
                 { text: 'Rename', action: () => renameScene(sceneName) },
                 { text: 'Delete', action: () => deleteScene(sceneName) }
@@ -861,6 +952,16 @@
                     document.removeEventListener('click', closeDropdown);
                 }, { once: true });
             }, 0);
+        }
+
+        function setSceneTransition(sceneName) {
+            const currentTime = scenes[sceneName].transitionTime || 5;
+            const newTime = prompt('Enter transition time in seconds:', currentTime);
+            if (newTime && !isNaN(newTime)) {
+                scenes[sceneName].transitionTime = Math.max(1, parseInt(newTime));
+                localStorage.setItem('scenes', JSON.stringify(scenes));
+                updateScenesList();
+            }
         }
 
         function duplicateScene(sceneName = currentScene) {
@@ -925,7 +1026,8 @@
         function getSceneData() {
             const sceneData = {
                 spotlights: {},
-                props: []
+                props: [],
+                transitionTime: parseInt(document.getElementById('transition-time').value) || 5
             };
             
             // Get spotlight values - Fixed to ensure proper value capture
@@ -1339,6 +1441,109 @@
                 }
             });
         });
+
+        // Add autoplay functionality
+        let autoplayInterval = null;
+        let isPlaying = false;
+
+        function toggleAutoplay() {
+            const button = document.querySelector('.autoplay-button');
+            
+            if (isPlaying) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+            
+            button.classList.toggle('playing');
+            button.textContent = isPlaying ? 'Stop' : 'Autoplay';
+        }
+
+        function startAutoplay() {
+            if (Object.keys(scenes).length < 2) {
+                alert('Need at least 2 scenes for autoplay');
+                return;
+            }
+
+            isPlaying = true;
+            const shouldLoop = document.getElementById('loop-autoplay').checked;
+            let sceneNames = Object.keys(scenes);
+            let currentIndex = Math.max(0, sceneNames.indexOf(currentScene));
+
+            function playNextScene() {
+                if (!isPlaying) return; // Check if still playing
+                
+                currentIndex++;
+                if (currentIndex >= sceneNames.length) {
+                    if (shouldLoop) {
+                        currentIndex = 0;
+                    } else {
+                        stopAutoplay();
+                        return;
+                    }
+                }
+
+                const nextSceneName = sceneNames[currentIndex];
+                loadScene(nextSceneName);
+                
+                // Schedule next scene using current scene's transition time
+                const transitionTime = (scenes[nextSceneName].transitionTime || 5) * 1000;
+                setTimeout(playNextScene, transitionTime);
+            }
+
+            // Initial load if no scene is active
+            if (!currentScene) {
+                currentScene = sceneNames[0];
+                loadScene(currentScene);
+            }
+
+            // Start with current scene's transition time
+            const initialTransitionTime = (scenes[currentScene].transitionTime || 5) * 1000;
+            setTimeout(playNextScene, initialTransitionTime);
+        }
+
+        function stopAutoplay() {
+            isPlaying = false;
+            clearInterval(autoplayInterval);
+            autoplayInterval = null;
+        }
+
+        // Add event listeners
+        document.querySelector('.autoplay-button').addEventListener('click', toggleAutoplay);
+
+        // Stop autoplay when manual scene changes are made
+        const originalLoadScene = loadScene;
+        loadScene = function(sceneName) {
+            if (isPlaying && autoplayInterval) {
+                stopAutoplay();
+                document.querySelector('.autoplay-button').classList.remove('playing');
+                document.querySelector('.autoplay-button').textContent = 'Autoplay';
+            }
+            originalLoadScene(sceneName);
+        };
+
+        // Save autoplay settings to localStorage
+        function saveAutoplaySettings() {
+            const settings = {
+                transitionTime: document.getElementById('transition-time').value,
+                loopEnabled: document.getElementById('loop-autoplay').checked
+            };
+            localStorage.setItem('autoplaySettings', JSON.stringify(settings));
+        }
+
+        // Load autoplay settings from localStorage
+        function loadAutoplaySettings() {
+            const settings = JSON.parse(localStorage.getItem('autoplaySettings') || '{"transitionTime": 5, "loopEnabled": true}');
+            document.getElementById('transition-time').value = settings.transitionTime;
+            document.getElementById('loop-autoplay').checked = settings.loopEnabled;
+        }
+
+        // Add event listeners for settings changes
+        document.getElementById('transition-time').addEventListener('change', saveAutoplaySettings);
+        document.getElementById('loop-autoplay').addEventListener('change', saveAutoplaySettings);
+
+        // Load settings when page loads
+        loadAutoplaySettings();
     </script>
 </body>
 </html>
