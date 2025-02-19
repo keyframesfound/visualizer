@@ -676,6 +676,7 @@
             display: inline-block;
             text-align: center;
             transition: background 0.3s, border-color 0.3s;
+            font-size: 0.8em;  /* Reduced font size for "Import" */
         }
         .import-button:hover {
             background: #666;
@@ -726,6 +727,7 @@
             <div class="scene-manager">
                 <div class="control-buttons">
                     <button class="export-pdf-button">Export Layout PDF</button>
+                    <!-- Removed Export Lighting button from here -->
                     <!-- Add autoplay controls -->
                     <div class="autoplay-controls">
                         <button class="autoplay-button">Autoplay</button>
@@ -751,11 +753,9 @@
                 <div class="scene-controls">
                     <button class="scene-button" id="createScene">Create</button>
                     <button class="scene-button" id="saveScene" disabled>Save</button>
-                    <button class="scene-button" id="exportScenes">Export</button>
-                    <!-- Replace the plain Import button with a styled label -->
-                    <!-- Old: <button class="scene-button" id="importScenes">Import</button> -->
                     <label for="importFile" class="scene-button import-button">Import</label>
                     <input type="file" id="importFile" class="hidden-file-input" accept=".json">
+                    <button class="scene-button" id="exportLightingButton" style="margin-left: -165px;">Export Lighting</button>
                 </div>
             </div>
             <div class="slider-panel">
@@ -1571,6 +1571,27 @@
         // Remove any legacy event listeners for an "import" button.
         // The file input will trigger the importScenes function on change:
         document.getElementById('importFile').onchange = importScenes;
+
+        // New exportLighting function to export scenes as JSON
+        function exportLighting() {
+            const exportData = {
+                scenes: scenes,
+                exportDate: new Date().toISOString(),
+                version: "1.0"
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Attach event listener to the new Export Lighting button
+        document.getElementById('exportLightingButton').addEventListener('click', exportLighting);
     </script>
 </body>
 </html>
