@@ -665,6 +665,22 @@
             font-size: 1rem;
             z-index: 10000;
         }
+
+        .import-button {
+            cursor: pointer;
+            background: #555;
+            color: white;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 5px 10px;
+            display: inline-block;
+            text-align: center;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .import-button:hover {
+            background: #666;
+            border-color: #aaa;
+        }
     </style>
     
     <!-- Add these scripts in the head section -->
@@ -736,7 +752,9 @@
                     <button class="scene-button" id="createScene">Create</button>
                     <button class="scene-button" id="saveScene" disabled>Save</button>
                     <button class="scene-button" id="exportScenes">Export</button>
-                    <button class="scene-button" id="importScenes">Import</button>
+                    <!-- Replace the plain Import button with a styled label -->
+                    <!-- Old: <button class="scene-button" id="importScenes">Import</button> -->
+                    <label for="importFile" class="scene-button import-button">Import</label>
                     <input type="file" id="importFile" class="hidden-file-input" accept=".json">
                 </div>
             </div>
@@ -1627,6 +1645,10 @@
 
         // Load settings when page loads
         loadAutoplaySettings();
+
+        // Remove any legacy event listeners for an "import" button.
+        // The file input will trigger the importScenes function on change:
+        document.getElementById('importFile').onchange = importScenes;
     </script>
 </body>
 </html>
