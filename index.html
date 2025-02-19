@@ -1688,9 +1688,8 @@
         document.getElementById('loop-autoplay').addEventListener('change', saveAutoplaySettings);
         // Load settings when page loads
         // Load settings when page loads
-        loadAutoplaySettings();
+
         // Remove any legacy event listeners for an "import" button.
-        // Remove any legacy event listeners for an "import" button.change:
         // The file input will trigger the importScenes function on change:
         document.getElementById('importFile').onchange = importScenes;
     </script>
