@@ -682,17 +682,21 @@
             background: #666;
             border-color: #aaa;
         }
+    
+        /* Add custom style to make the Clear All Scenes button longer horizontally */
+        #clearAllScenesButton {
+            min-width: 80px;
+        }
+    
     </style>
     
-    <!-- Add these scripts in the head section -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <!-- Added credits element -->
     <div class="credits">Developed By Ryan Yeung - Head of Stage Management Team 24-25</div>
     
-    <!-- Add loading screen -->
+    <!-- loading screen -->
     <div class="loading-screen">
         <div class="loading-content">
             <img src="sitefile/logo.png" alt="Logo" class="loading-logo">
@@ -756,6 +760,8 @@
                     <label for="importFile" class="scene-button import-button">Import</label>
                     <input type="file" id="importFile" class="hidden-file-input" accept=".json">
                     <button class="scene-button" id="exportLightingButton" style="margin-left: -165px;">Export Lighting</button>
+                    <!-- New Clear All Scenes button added here -->
+                    <button class="scene-button" id="clearAllScenesButton">Clear All</button>
                 </div>
             </div>
             <div class="slider-panel">
@@ -1592,6 +1598,15 @@
         
         // Attach event listener to the new Export Lighting button
         document.getElementById('exportLightingButton').addEventListener('click', exportLighting);
+        // New event listener for Clear All Scenes button
+        document.getElementById('clearAllScenesButton').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all scenes?')) {
+                scenes = {};
+                currentScene = null;
+                localStorage.setItem('scenes', JSON.stringify(scenes));
+                updateScenesList();
+            }
+        });
     </script>
 </body>
 </html>
