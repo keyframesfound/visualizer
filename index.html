@@ -655,6 +655,16 @@
         .trash-bin.hidden {
             display: none;
         }
+
+        /* Added credits style */
+        .credits {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 1rem;
+            z-index: 10000;
+        }
     </style>
     
     <!-- Add these scripts in the head section -->
@@ -662,6 +672,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+    <!-- Added credits element -->
+    <div class="credits">Developed By Ryan Yeung - Head of Stage Management Team 24-25</div>
+    
     <!-- Add loading screen -->
     <div class="loading-screen">
         <div class="loading-content">
@@ -1306,44 +1319,53 @@
             URL.revokeObjectURL(url);
         }
 
+        // Updated importScenes function
         function importScenes(event) {
             const file = event.target.files[0];
             if (!file) return;
-
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    
                     if (!data.scenes || !data.version) {
                         throw new Error('Invalid file format');
                     }
-
+                    
                     const importedScenes = data.scenes;
                     const sceneNames = Object.keys(importedScenes);
-                    
                     if (sceneNames.length === 0) {
                         alert('No scenes found in file');
                         return;
                     }
-
-                    for (const sceneName of sceneNames) {
+                    
+                    sceneNames.forEach(sceneName => {
                         const sceneData = importedScenes[sceneName];
-                        for (const key in sceneData) {
-                            sceneData[key] = Math.min(10, Math.max(0, sceneData[key]));
+                        
+                        // Clamp spotlight values if available
+                        if (sceneData.spotlights) {
+                            Object.keys(sceneData.spotlights).forEach(spot => {
+                                sceneData.spotlights[spot] = Math.min(10, Math.max(0, sceneData.spotlights[spot]));
+                            });
                         }
-                    }
-
-                    const existingNames = Object.keys(scenes).filter(name => 
-                        sceneNames.includes(name)
-                    );
-
+                        
+                        // Normalize transitionTime
+                        if (sceneData.transitionTime) {
+                            sceneData.transitionTime = Math.max(1, parseInt(sceneData.transitionTime)) || 5;
+                        } else {
+                            sceneData.transitionTime = 5;
+                        }
+                        
+                        // Leave props as-is
+                    });
+                    
+                    const existingNames = Object.keys(scenes).filter(name => sceneNames.includes(name));
                     if (existingNames.length > 0) {
                         if (!confirm(`The following scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
                             return;
                         }
                     }
-
+                    
                     scenes = { ...scenes, ...importedScenes };
                     localStorage.setItem('scenes', JSON.stringify(scenes));
                     updateScenesList();
@@ -1355,10 +1377,6 @@
             reader.readAsText(file);
             event.target.value = '';
         }
-
-        exportScenesBtn.onclick = exportScenes;
-        importScenesBtn.onclick = () => importFile.click();
-        importFile.onchange = importScenes;
 
         createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
