@@ -922,7 +922,7 @@
                 // Add transition time display
                 const transitionSpan = document.createElement('span');
                 transitionSpan.className = 'scene-transition';
-                transitionSpan.textContent = `${scenes[sceneName].transitionTime || 5}s`;
+                transitionSpan.textContent = `${scenes[sceneName].transitionTime || 5000}ms`;
                 
                 const moreButton = document.createElement('span');
                 moreButton.className = 'more-options';
@@ -1002,8 +1002,8 @@
         }
 
         function setSceneTransition(sceneName) {
-            const currentTime = scenes[sceneName].transitionTime || 5;
-            const newTime = prompt('Enter transition time in seconds:', currentTime);
+            const currentTime = scenes[sceneName].transitionTime || 5000;
+            const newTime = prompt('Enter transition time in milliseconds:', currentTime);
             if (newTime && !isNaN(newTime)) {
                 scenes[sceneName].transitionTime = Math.max(1, parseInt(newTime));
                 localStorage.setItem('scenes', JSON.stringify(scenes));
@@ -1074,7 +1074,7 @@
             const sceneData = {
                 spotlights: {},
                 props: [],
-                transitionTime: 5 // Default transition time
+                transitionTime: 5000 // Default transition time in ms
             };
             
             // Get spotlight values - Fixed to ensure proper value capture
@@ -1369,9 +1369,9 @@
                         
                         // Normalize transitionTime
                         if (sceneData.transitionTime) {
-                            sceneData.transitionTime = Math.max(1, parseInt(sceneData.transitionTime)) || 5;
+                            sceneData.transitionTime = Math.max(1, parseInt(sceneData.transitionTime)) || 5000;
                         } else {
-                            sceneData.transitionTime = 5;
+                            sceneData.transitionTime = 5000;
                         }
                         
                         // Leave props as-is
@@ -1394,6 +1394,49 @@
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        function startAutoplay() {
+            if (Object.keys(scenes).length < 2) {
+                alert('Need at least 2 scenes for autoplay');
+                return;
+            }
+
+            isPlaying = true;
+            const shouldLoop = document.getElementById('loop-autoplay').checked;
+            let sceneNames = Object.keys(scenes);
+            let currentIndex = Math.max(0, sceneNames.indexOf(currentScene));
+
+            function playNextScene() {
+                if (!isPlaying) return; // Check if still playing
+                
+                currentIndex++;
+                if (currentIndex >= sceneNames.length) {
+                    if (shouldLoop) {
+                        currentIndex = 0;
+                    } else {
+                        stopAutoplay();
+                        return;
+                    }
+                }
+
+                const nextSceneName = sceneNames[currentIndex];
+                loadScene(nextSceneName);
+                
+                // Schedule next scene using current scene's transition time
+                const transitionTime = scenes[nextSceneName].transitionTime || 5000;
+                setTimeout(playNextScene, transitionTime);
+            }
+
+            // Initial load if no scene is active
+            if (!currentScene) {
+                currentScene = sceneNames[0];
+                loadScene(currentScene);
+            }
+
+            // Start with current scene's transition time
+            const initialTransitionTime = scenes[currentScene].transitionTime || 5000;
+            setTimeout(playNextScene, initialTransitionTime);
         }
 
         createSceneBtn.onclick = createScene;
@@ -1591,7 +1634,7 @@
                 loadScene(nextSceneName);
                 
                 // Schedule next scene using current scene's transition time
-                const transitionTime = (scenes[nextSceneName].transitionTime || 5) * 1000;
+                const transitionTime = scenes[nextSceneName].transitionTime || 5000;
                 setTimeout(playNextScene, transitionTime);
             }
 
@@ -1602,7 +1645,7 @@
             }
 
             // Start with current scene's transition time
-            const initialTransitionTime = (scenes[currentScene].transitionTime || 5) * 1000;
+            const initialTransitionTime = scenes[currentScene].transitionTime || 5000;
             setTimeout(playNextScene, initialTransitionTime);
         }
 
