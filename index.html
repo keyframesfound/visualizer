@@ -828,15 +828,17 @@
     <script>
         // Add loading screen handler at the start of your scripts
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.querySelector('.loading-screen').classList.add('fade-out');
-                document.querySelector('.main-content').classList.add('visible');
-                
-                // Remove loading screen after animation
+            const loadingScreen = document.querySelector('.loading-screen');
+            const mainContent = document.querySelector('.main-content');
+            if (loadingScreen && mainContent) {
                 setTimeout(() => {
-                    document.querySelector('.loading-screen').remove();
-                }, 500);
-            }, 1500); // Show loading screen for 1.5 seconds
+                    loadingScreen.classList.add('fade-out');
+                    mainContent.classList.add('visible');
+                    setTimeout(() => {
+                        loadingScreen.remove();
+                    }, 500);
+                }, 1500);
+            }
         });
 
         const controlPanelButton = document.querySelector('.control-panel-button');
@@ -1003,66 +1005,53 @@
 
         function setSceneTransition(sceneName) {
             const currentTime = scenes[sceneName].transitionTime || 5000;
-            const currentTime = scenes[sceneName].transitionTime || 5000;:', currentTime);
             const newTime = prompt('Enter transition time in milliseconds:', currentTime);
-            if (newTime && !isNaN(newTime)) {ime = Math.max(1, parseInt(newTime));
+            if (newTime && !isNaN(newTime)) {
                 scenes[sceneName].transitionTime = Math.max(1, parseInt(newTime));
                 localStorage.setItem('scenes', JSON.stringify(scenes));
                 updateScenesList();
             }
         }
         function duplicateScene(sceneName = currentScene) {
-        function duplicateScene(sceneName = currentScene) {
             if (!sceneName) return;
             const sceneCount = Object.keys(scenes).length;
-            const sceneCount = Object.keys(scenes).length;
-            if (sceneCount >= 4) {it of 4 scenes reached. Please delete a scene before duplicating.');
+            if (sceneCount >= 4) {
                 alert('Maximum limit of 4 scenes reached. Please delete a scene before duplicating.');
                 return;
             }
             const baseName = sceneName;
-            const baseName = sceneName;(copy)`;
             let newName = `${baseName} (copy)`;
             let counter = 1;
             while (scenes[newName]) {
-            while (scenes[newName]) {
-                counter++;`${baseName} (copy ${counter})`;
+                counter++;
                 newName = `${baseName} (copy ${counter})`;
             }
-            scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
             scenes[newName] = JSON.parse(JSON.stringify(scenes[baseName]));
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = newName;
             updateScenesList();
         }
         function renameScene(sceneName = currentScene) {
-        function renameScene(sceneName = currentScene) {
             if (!sceneName) return;
-            const newName = prompt('Enter new scene name:', sceneName);
             const newName = prompt('Enter new scene name:', sceneName);
             if (!newName || newName === sceneName) return;
             if (scenes[newName]) {
-            if (scenes[newName]) {h this name already exists');
                 alert('A scene with this name already exists');
                 return;
             }
             scenes[newName] = scenes[sceneName];
-            scenes[newName] = scenes[sceneName];
-            delete scenes[sceneName];nes', JSON.stringify(scenes));
+            delete scenes[sceneName];
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = newName;
             updateScenesList();
         }
         function deleteScene(sceneName = currentScene) {
-        function deleteScene(sceneName = currentScene) {
             if (!sceneName) return;
             if (confirm(`Are you sure you want to delete scene "${sceneName}"?`)) {
-            if (confirm(`Are you sure you want to delete scene "${sceneName}"?`)) {
-                delete scenes[sceneName];nes', JSON.stringify(scenes));
+                delete scenes[sceneName];
                 localStorage.setItem('scenes', JSON.stringify(scenes));
                 currentScene = null;
                 updateScenesList();
-                // Re-enable create button if we're below the limit
                 // Re-enable create button if we're below the limit
                 if (Object.keys(scenes).length < 4) {
                     createSceneBtn.disabled = false;
@@ -1071,142 +1060,115 @@
             }
         }
         function getSceneData() {
-        function getSceneData() {
             const sceneData = {
                 spotlights: {},
-                props: [],Time: 5000 // Default transition time in ms
+                props: [],
                 transitionTime: 5000 // Default transition time in ms
             };
             // Get spotlight values - Fixed to ensure proper value capture
-            // Get spotlight values - Fixed to ensure proper value capture=> {
             document.querySelectorAll('.spotlight-slider').forEach(slider => {
                 const spotlightNum = slider.dataset.spotlight;
-                const value = parseInt(slider.value) || 0;;
+                const value = parseInt(slider.value) || 0;
                 sceneData.spotlights[spotlightNum] = value;
             });
             // Get prop positions
-            // Get prop positionsrAll('.stage-prop').forEach(prop => {
             document.querySelectorAll('.stage-prop').forEach(prop => {
-                sceneData.props.push({me.split('prop-')[1],
+                sceneData.props.push({
                     type: prop.className.split('prop-')[1],
                     left: prop.style.left,
                     top: prop.style.top
                 });
             });
             return sceneData;
-            return sceneData;
         }
         function createScene() {
-        function createScene() {ompt('Enter scene name:');
             const sceneName = prompt('Enter scene name:');
-            if (!sceneName) return;{
-            if (scenes[sceneName]) {this name already exists');
+            if (!sceneName) return;
+            if (scenes[sceneName]) {
                 alert('A scene with this name already exists');
                 return;
             }
             scenes[sceneName] = getSceneData();
-            scenes[sceneName] = getSceneData();.stringify(scenes));
             localStorage.setItem('scenes', JSON.stringify(scenes));
             currentScene = sceneName;
             // Calculate total scenes and adjust current page
-            // Calculate total scenes and adjust current page
-            const totalScenes = Object.keys(scenes).length;erPage);
+            const totalScenes = Object.keys(scenes).length;
             const newPage = Math.ceil(totalScenes / scenesPerPage);
             // Move to new page if current page is full
-            // Move to new page if current page is fulls).slice((currentPage - 1) * scenesPerPage, currentPage * scenesPerPage);
             const currentPageScenes = Object.keys(scenes).slice((currentPage - 1) * scenesPerPage, currentPage * scenesPerPage);
             if (currentPageScenes.length >= 4) {
                 currentPage = newPage;
             }
             updateScenesList();
-            updateScenesList();
         }
         function saveScene() {
-        function saveScene() { return;
-            if (!currentScene) return;SceneData();
-            scenes[currentScene] = getSceneData();ringify(scenes));
+            if (!currentScene) return;
+            scenes[currentScene] = getSceneData();
             localStorage.setItem('scenes', JSON.stringify(scenes));
             alert('Scene saved successfully');
         }
         function animateSlider(slider, targetValue) {
-        function animateSlider(slider, targetValue) {
-            return new Promise(resolve => {(slider.value);
+            return new Promise(resolve => {
                 const startValue = parseInt(slider.value);
                 const startTime = performance.now();
                 const duration = 500;
                 function updateValue(currentTime) {
-                function updateValue(currentTime) {tartTime;
-                    const elapsed = currentTime - startTime;tion, 1);
+                    const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     const easeProgress = progress < .5 ? 
-                    const easeProgress = progress < .5 ? s : 
-                        4 * progress * progress * progress : 2;
+                        4 * progress * progress * progress : 
                         1 - Math.pow(-2 * progress + 2, 3) / 2;
-                    const currentValue = Math.round(startValue + (targetValue - startValue) * easeProgress);
                     const currentValue = Math.round(startValue + (targetValue - startValue) * easeProgress);
                     slider.value = currentValue;
                     const spotlightNum = slider.dataset.spotlight;
-                    const spotlightNum = slider.dataset.spotlight;tlight-${spotlightNum}`);
                     const spotlight = document.querySelector(`#spotlight-${spotlightNum}`);
                     const opacity = currentValue / 10;
                     spotlight.style.opacity = opacity;
                     const container = slider.parentElement;
-                    const container = slider.parentElement;ctor('.brightness-input');
                     const numberInput = container.querySelector('.brightness-input');
                     numberInput.value = currentValue;
                     if (progress < 1) {
-                    if (progress < 1) {nFrame(updateValue);
                         requestAnimationFrame(updateValue);
-                    } else {lve();
+                    } else {
                         resolve();
                     }
                 }
                 requestAnimationFrame(updateValue);
-                requestAnimationFrame(updateValue);
             });
         }
         async function loadScene(sceneName) {
-        async function loadScene(sceneName) {e];
             const sceneData = scenes[sceneName];
             if (!sceneData) return;
             const animationPromises = [];
-            const animationPromises = [];
             // Clear existing props
-            // Clear existing propsll('.stage-prop').forEach(prop => prop.remove());
             document.querySelectorAll('.stage-prop').forEach(prop => prop.remove());
             // Load props
-            // Load props.props) {
-            if (sceneData.props) {rEach(prop => {
-                sceneData.props.forEach(prop => {eateElement('div');
-                    const stageProp = document.createElement('div');pe}`;
+            if (sceneData.props) {
+                sceneData.props.forEach(prop => {
+                    const stageProp = document.createElement('div');
                     stageProp.className = `stage-prop prop-${prop.type}`;
                     stageProp.style.left = prop.left;
-                    stageProp.style.top = prop.top;floor').appendChild(stageProp);
+                    stageProp.style.top = prop.top;
                     document.querySelector('.stage-floor').appendChild(stageProp);
                     makeElementDraggable(stageProp);
                 });
             }
             // Load spotlight values - Fixed to ensure proper value assignment
-            // Load spotlight values - Fixed to ensure proper value assignment
-            const spotlightData = sceneData.spotlights || {};rEach(slider => {
+            const spotlightData = sceneData.spotlights || {};
             document.querySelectorAll('.spotlight-slider').forEach(slider => {
-                const spotlightNum = slider.dataset.spotlight;potlightData[spotlightNum] || 0));
+                const spotlightNum = slider.dataset.spotlight;
                 const targetValue = Math.min(10, Math.max(0, spotlightData[spotlightNum] || 0));
                 // Update the corresponding number input
-                // Update the corresponding number input
-                const container = slider.parentElement;ctor('.brightness-input');
+                const container = slider.parentElement;
                 const numberInput = container.querySelector('.brightness-input');
                 numberInput.value = targetValue;
-                const promise = animateSlider(slider, targetValue);
                 const promise = animateSlider(slider, targetValue);
                 animationPromises.push(promise);
             });
             await Promise.all(animationPromises);
-            await Promise.all(animationPromises);
             currentScene = sceneName;
             updateScenesList();
         }
-        function makeElementDraggable(element) {
         function makeElementDraggable(element) {
             let isDragging = false;
             let currentX;
@@ -1214,479 +1176,396 @@
             let initialX;
             let initialY;
             // Mouse events
-            // Mouse eventstListener('mousedown', startDragging);
             element.addEventListener('mousedown', startDragging);
-            document.addEventListener('mousemove', drag);ging);
+            document.addEventListener('mousemove', drag);
             document.addEventListener('mouseup', stopDragging);
             // Touch events
-            // Touch eventstListener('touchstart', handleTouchStart);
             element.addEventListener('touchstart', handleTouchStart);
             document.addEventListener('touchmove', handleTouchMove);
             document.addEventListener('touchend', handleTouchEnd);
             function handleTouchStart(e) {
-            function handleTouchStart(e) {;
-                const touch = e.touches[0];element.offsetLeft;
+                const touch = e.touches[0];
                 initialX = touch.clientX - element.offsetLeft;
                 initialY = touch.clientY - element.offsetTop;
                 isDragging = true;
                 handleDragStart();
             }
             function handleTouchMove(e) {
-            function handleTouchMove(e) {
-                if (isDragging) {ult();
-                    e.preventDefault();ches[0];
-                    const touch = e.touches[0];initialX;
+                if (isDragging) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
                     currentX = touch.clientX - initialX;
-                    currentY = touch.clientY - initialY;;
+                    currentY = touch.clientY - initialY;
                     element.style.left = `${currentX}px`;
-                    element.style.top = `${currentY}px`;ntY);
+                    element.style.top = `${currentY}px`;
                     handleDrag(touch.clientX, touch.clientY);
                 }
             }
             function handleTouchEnd(e) {
-            function handleTouchEnd(e) {
-                if (isDragging) { e.changedTouches[0];
-                    const touch = e.changedTouches[0];.clientY);
+                if (isDragging) {
+                    const touch = e.changedTouches[0];
                     handleDragEnd(touch.clientX, touch.clientY);
-                }sDragging = false;
+                }
                 isDragging = false;
             }
             function startDragging(e) {
-            function startDragging(e) {element.offsetLeft;
                 initialX = e.clientX - element.offsetLeft;
                 initialY = e.clientY - element.offsetTop;
                 isDragging = true;
                 handleDragStart();
             }
             function drag(e) {
-            function drag(e) {) {
-                if (isDragging) {ult();
-                    e.preventDefault();X - initialX;
+                if (isDragging) {
+                    e.preventDefault();
                     currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;}px`;
+                    currentY = e.clientY - initialY;
                     element.style.left = `${currentX}px`;
                     element.style.top = `${currentY}px`;
                     handleDrag(e.clientX, e.clientY);
                 }
             }
             function stopDragging(e) {
-            function stopDragging(e) {
-                if (isDragging) {(e.clientX, e.clientY);
+                if (isDragging) {
                     handleDragEnd(e.clientX, e.clientY);
-                }sDragging = false;
+                }
                 isDragging = false;
             }
             const trashBin = document.getElementById('trashBin');
-            const trashBin = document.getElementById('trashBin');
             function showTrashBin() {
-            function showTrashBin() {move('hidden');
                 trashBin.classList.remove('hidden');
             }
             function hideTrashBin() {
-            function hideTrashBin() {move('drag-over');
                 trashBin.classList.remove('drag-over');
                 trashBin.classList.add('hidden');
             }
             function handleDragStart() {
-            function handleDragStart() {
                 showTrashBin();
             }
             function handleDrag(x, y) {
-            function handleDrag(x, y) {Bin.getBoundingClientRect();
-                const trashRect = trashBin.getBoundingClientRect();shRect.right && 
+                const trashRect = trashBin.getBoundingClientRect();
                 const isOverTrash = x >= trashRect.left && x <= trashRect.right && 
                                   y >= trashRect.top && y <= trashRect.bottom;
                 if (isOverTrash) {
-                if (isOverTrash) {List.add('drag-over');
                     trashBin.classList.add('drag-over');
-                } else {hBin.classList.remove('drag-over');
+                } else {
                     trashBin.classList.remove('drag-over');
                 }
             }
             function handleDragEnd(x, y) {
-            function handleDragEnd(x, y) {.getBoundingClientRect();
-                const trashRect = trashBin.getBoundingClientRect();shRect.right && 
+                const trashRect = trashBin.getBoundingClientRect();
                 const isOverTrash = x >= trashRect.left && x <= trashRect.right && 
                                   y >= trashRect.top && y <= trashRect.bottom;
                 if (isOverTrash) {
-                if (isOverTrash) {();
-                    element.remove(); {
-                    if (currentScene) {sabled = false;
+                    element.remove();
+                    if (currentScene) {
                         saveSceneBtn.disabled = false;
                     }
-                }ideTrashBin();
+                }
                 hideTrashBin();
             }
         }
         function exportScenes() {
-        function exportScenes() {
             const scenesData = {
-                scenes: scenes, Date().toISOString(),
+                scenes: scenes,
                 exportDate: new Date().toISOString(),
                 version: "1.0"
             };
             const blob = new Blob([JSON.stringify(scenesData, null, 2)], { type: 'application/json' });
-            const blob = new Blob([JSON.stringify(scenesData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            const a = document.createElement('a');
-            a.href = url;`lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
+            a.href = url;
             a.download = `lighting-scenes-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
-            a.click();ody.removeChild(a);
+            a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
         // Updated importScenes function
-        // Updated importScenes function
-        function importScenes(event) {files[0];
+        function importScenes(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            const reader = new FileReader();
             reader.onload = function(e) {
-                try {onst data = JSON.parse(e.target.result);
+                try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.scenes || !data.version) {rmat');
+                    if (!data.scenes || !data.version) {
                         throw new Error('Invalid file format');
                     }
                     const importedScenes = data.scenes;
-                    const importedScenes = data.scenes;rtedScenes);
                     const sceneNames = Object.keys(importedScenes);
-                    if (sceneNames.length === 0) {file');
+                    if (sceneNames.length === 0) {
                         alert('No scenes found in file');
                         return;
                     }
                     sceneNames.forEach(sceneName => {
-                    sceneNames.forEach(sceneName => {nes[sceneName];
                         const sceneData = importedScenes[sceneName];
                         // Clamp spotlight values if available
-                        // Clamp spotlight values if available
-                        if (sceneData.spotlights) {potlights).forEach(spot => {
-                            Object.keys(sceneData.spotlights).forEach(spot => {max(0, sceneData.spotlights[spot]));
+                        if (sceneData.spotlights) {
+                            Object.keys(sceneData.spotlights).forEach(spot => {
                                 sceneData.spotlights[spot] = Math.min(10, Math.max(0, sceneData.spotlights[spot]));
                             });
                         }
                         // Normalize transitionTime
-                        // Normalize transitionTimee) {
-                        if (sceneData.transitionTime) {Math.max(1, parseInt(sceneData.transitionTime)) || 5000;
+                        if (sceneData.transitionTime) {
                             sceneData.transitionTime = Math.max(1, parseInt(sceneData.transitionTime)) || 5000;
-                        } else {eData.transitionTime = 5000;
+                        } else {
                             sceneData.transitionTime = 5000;
                         }
                         // Leave props as-is
-                        // Leave props as-is
                     });
                     const existingNames = Object.keys(scenes).filter(name => sceneNames.includes(name));
-                    const existingNames = Object.keys(scenes).filter(name => sceneNames.includes(name));
-                    if (existingNames.length > 0) { scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
+                    if (existingNames.length > 0) {
                         if (!confirm(`The following scenes will be overwritten:\n${existingNames.join(', ')}\n\nContinue?`)) {
                             return;
                         }
                     }
                     scenes = { ...scenes, ...importedScenes };
-                    scenes = { ...scenes, ...importedScenes };ify(scenes));
                     localStorage.setItem('scenes', JSON.stringify(scenes));
-                    updateScenesList(); imported ${sceneNames.length} scenes`);
+                    updateScenesList();
                     alert(`Successfully imported ${sceneNames.length} scenes`);
-                } catch (error) {importing scenes: ' + error.message);
+                } catch (error) {
                     alert('Error importing scenes: ' + error.message);
                 }
-            };ader.readAsText(file);
+            };
             reader.readAsText(file);
             event.target.value = '';
         }
         function startAutoplay() {
-        function startAutoplay() {).length < 2) {
-            if (Object.keys(scenes).length < 2) { autoplay');
+            if (Object.keys(scenes).length < 2) {
                 alert('Need at least 2 scenes for autoplay');
                 return;
             }
             isPlaying = true;
-            isPlaying = true;= document.getElementById('loop-autoplay').checked;
             const shouldLoop = document.getElementById('loop-autoplay').checked;
-            let sceneNames = Object.keys(scenes);ames.indexOf(currentScene));
+            let sceneNames = Object.keys(scenes);
             let currentIndex = Math.max(0, sceneNames.indexOf(currentScene));
             function playNextScene() {
-            function playNextScene() {; // Check if still playing
                 if (!isPlaying) return; // Check if still playing
                 currentIndex++;
-                currentIndex++;x >= sceneNames.length) {
                 if (currentIndex >= sceneNames.length) {
-                    if (shouldLoop) {= 0;
+                    if (shouldLoop) {
                         currentIndex = 0;
-                    } else {Autoplay();
+                    } else {
                         stopAutoplay();
                         return;
                     }
                 }
                 const nextSceneName = sceneNames[currentIndex];
-                const nextSceneName = sceneNames[currentIndex];
                 loadScene(nextSceneName);
                 // Schedule next scene using current scene's transition time
-                // Schedule next scene using current scene's transition time|| 5000;
                 const transitionTime = scenes[nextSceneName].transitionTime || 5000;
                 setTimeout(playNextScene, transitionTime);
             }
             // Initial load if no scene is active
-            // Initial load if no scene is active
-            if (!currentScene) {ceneNames[0];
+            if (!currentScene) {
                 currentScene = sceneNames[0];
                 loadScene(currentScene);
             }
             // Start with current scene's transition time
-            // Start with current scene's transition timecene].transitionTime || 5000;
             const initialTransitionTime = scenes[currentScene].transitionTime || 5000;
             setTimeout(playNextScene, initialTransitionTime);
         }
         createSceneBtn.onclick = createScene;
-        createSceneBtn.onclick = createScene;
         saveSceneBtn.onclick = saveScene;
         updateScenesList();
-        updateScenesList();
-        document.getElementById('prevPage').addEventListener('click', () => {
         document.getElementById('prevPage').addEventListener('click', () => {
             if (currentPage > 1) {
-                currentPage--;st();
+                currentPage--;
                 updateScenesList();
             }
         });
         document.getElementById('nextPage').addEventListener('click', () => {
-        document.getElementById('nextPage').addEventListener('click', () => {
-            const totalScenes = Object.keys(scenes).length;esPerPage);
+            const totalScenes = Object.keys(scenes).length;
             const totalPages = Math.ceil(totalScenes / scenesPerPage);
             if (currentPage < totalPages) {
-                currentPage++;st();
+                currentPage++;
                 updateScenesList();
             }
         });
         document.querySelectorAll('.prop-item').forEach(prop => {
-        document.querySelectorAll('.prop-item').forEach(prop => {
             const createProp = (clientX, clientY) => {
-                const type = prop.dataset.prop;teElement('div');
+                const type = prop.dataset.prop;
                 const stageProp = document.createElement('div');
                 stageProp.className = `stage-prop prop-${type}`;
                 const stageFloor = document.querySelector('.stage-floor');
-                const stageFloor = document.querySelector('.stage-floor');
                 const stageRect = stageFloor.getBoundingClientRect();
                 // Calculate center position of stage
-                // Calculate center position of stagegeRect.width / 2);
                 const centerX = stageRect.left + (stageRect.width / 2);
                 const centerY = stageRect.top + (stageRect.height / 3);
                 stageProp.style.left = `${centerX}px`;
-                stageProp.style.left = `${centerX}px`;
                 stageProp.style.top = `${centerY}px`;
-                stageFloor.appendChild(stageProp);
                 stageFloor.appendChild(stageProp);
                 makeElementDraggable(stageProp);
             };
             // Mouse event
-            // Mouse eventistener('mousedown', (e) => {
             prop.addEventListener('mousedown', (e) => {
                 createProp(e.clientX, e.clientY);
             });
             // Touch event
-            // Touch eventistener('touchstart', (e) => {
-            prop.addEventListener('touchstart', (e) => { events
+            prop.addEventListener('touchstart', (e) => {
                 e.preventDefault(); // Prevent duplicate events
-                const touch = e.touches[0];ouch.clientY);
+                const touch = e.touches[0];
                 createProp(touch.clientX, touch.clientY);
             });
         });
         // Add PDF export functionality
-        // Add PDF export functionality
-        function exportLayoutPDF() {ocument.querySelector('.stage-container');
+        function exportLayoutPDF() {
             const stageContainer = document.querySelector('.stage-container');
             // Temporarily hide spotlights for the capture
-            // Temporarily hide spotlights for the capture.spotlight-location');
             const spotlights = document.querySelectorAll('.spotlight-location');
             spotlights.forEach(spot => spot.style.display = 'none');
             html2canvas(stageContainer).then(canvas => {
-            html2canvas(stageContainer).then(canvas => {
-                // Restore spotlightsot => spot.style.display = '');
+                // Restore spotlights
                 spotlights.forEach(spot => spot.style.display = '');
                 // Count props
-                // Count propsts = {};
-                const propCounts = {};All('.stage-prop').forEach(prop => {
+                const propCounts = {};
                 document.querySelectorAll('.stage-prop').forEach(prop => {
-                    const type = prop.className.split('prop-')[1];;
+                    const type = prop.className.split('prop-')[1];
                     propCounts[type] = (propCounts[type] || 0) + 1;
                 });
                 // Create PDF in portrait orientation with more space for inventory
-                // Create PDF using jsPDF from the UMD bundle
                 const jsPDF = window.jspdf.jsPDF;  // Modified line
-                const pdf = new jsPDF({ait',
+                const pdf = new jsPDF({
                     orientation: 'portrait',
-                    unit: 'px',nvas.width, canvas.height + 400] // Doubled space for inventory
+                    unit: 'px',
                     format: [canvas.width, canvas.height + 400] // Doubled space for inventory
                 });
                 // Scale down the image to fit portrait orientation
-                // Scale down the image to fit portrait orientationwidth;
                 const scale = pdf.internal.pageSize.width / canvas.width;
                 const scaledHeight = canvas.height * scale;
                 // Add stage image
-                // Add stage image
-                pdf.addImage(DataURL('image/png'), 
-                    canvas.toDataURL('image/png'), 
+                pdf.addImage(canvas.toDataURL('image/png'), 
                     'PNG', 
                     0, 
-                    0, .internal.pageSize.width, 
+                    0, 
                     pdf.internal.pageSize.width, 
                     scaledHeight
                 );
                 // Add inventory count with larger font
-                // Add inventory count with larger font24
                 pdf.setFontSize(36); // Increased from 24
-                pdf.setFont("helvetica", "bold");', 20, scaledHeight + 60); // Increased spacing
+                pdf.setFont("helvetica", "bold");
                 pdf.text('Stage Layout Inventory:', 20, scaledHeight + 60); // Increased spacing
                 pdf.setFontSize(28); // Increased from 18
-                pdf.setFontSize(28); // Increased from 18
-                pdf.setFont("helvetica", "normal");ncreased initial spacing
+                pdf.setFont("helvetica", "normal");
                 let yPos = scaledHeight + 120; // Increased initial spacing
                 for (const [prop, count] of Object.entries(propCounts)) {
-                    // Format prop name to be more readablerd => 
-                    const propName = prop.split('-').map(word => (1)
+                    // Format prop name to be more readable
+                    const propName = prop.split('-').map(word => 
                         word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ');propName}: ${count}`, 40, yPos); // Increased left margin
+                    ).join(' ');
                     pdf.text(`${propName}: ${count}`, 40, yPos); // Increased left margin
                     yPos += 50; // Increased spacing between items
                 }
                 // Save the PDF
-                // Save the PDF-layout-${new Date().toISOString().split('T')[0]}.pdf`);
                 pdf.save(`stage-layout-${new Date().toISOString().split('T')[0]}.pdf`);
             });
         }
         // Add click handler for PDF export button
-        // Add click handler for PDF export button').addEventListener('click', exportLayoutPDF);
         document.querySelector('.export-pdf-button').addEventListener('click', exportLayoutPDF);
         // Update the slider input handler to ensure proper value synchronization
-        // Update the slider input handler to ensure proper value synchronization
-        sliders.forEach(slider => {r.parentElement;
-            const container = slider.parentElement;ctor('.brightness-input');
+        sliders.forEach(slider => {
+            const container = slider.parentElement;
             const numberInput = container.querySelector('.brightness-input');
             slider.addEventListener('input', (e) => {
-            slider.addEventListener('input', (e) => {);
                 const value = parseInt(e.target.value);
-                numberInput.value = value;der, value);
+                numberInput.value = value;
                 updateSpotlightOpacity(slider, value);
                 // Enable save button when changes are made
-                // Enable save button when changes are made
-                if (currentScene) {sabled = false;
+                if (currentScene) {
                     saveSceneBtn.disabled = false;
                 }
             });
             numberInput.addEventListener('input', (e) => {
-            numberInput.addEventListener('input', (e) => {
-                let value = parseInt(e.target.value);e));
+                let value = parseInt(e.target.value);
                 value = Math.min(10, Math.max(0, value));
                 e.target.value = value;
-                slider.value = value;y(slider, value);
+                slider.value = value;
                 updateSpotlightOpacity(slider, value);
                 // Enable save button when changes are made
-                // Enable save button when changes are made
-                if (currentScene) {sabled = false;
+                if (currentScene) {
                     saveSceneBtn.disabled = false;
                 }
             });
         });
         // Add autoplay functionality
-        // Add autoplay functionality
         let autoplayInterval = null;
         let isPlaying = false;
         function toggleAutoplay() {
-        function toggleAutoplay() {.querySelector('.autoplay-button');
             const button = document.querySelector('.autoplay-button');
             if (isPlaying) {
-            if (isPlaying) {();
                 stopAutoplay();
-            } else {tAutoplay();
+            } else {
                 startAutoplay();
             }
             button.classList.toggle('playing');
-            button.classList.toggle('playing');top' : 'Autoplay';
             button.textContent = isPlaying ? 'Stop' : 'Autoplay';
         }
         function startAutoplay() {
-        function startAutoplay() {).length < 2) {
-            if (Object.keys(scenes).length < 2) { autoplay');
+            if (Object.keys(scenes).length < 2) {
                 alert('Need at least 2 scenes for autoplay');
                 return;
             }
             isPlaying = true;
-            isPlaying = true;= document.getElementById('loop-autoplay').checked;
             const shouldLoop = document.getElementById('loop-autoplay').checked;
-            let sceneNames = Object.keys(scenes);ames.indexOf(currentScene));
+            let sceneNames = Object.keys(scenes);
             let currentIndex = Math.max(0, sceneNames.indexOf(currentScene));
             function playNextScene() {
-            function playNextScene() {; // Check if still playing
                 if (!isPlaying) return; // Check if still playing
                 currentIndex++;
-                currentIndex++;x >= sceneNames.length) {
                 if (currentIndex >= sceneNames.length) {
-                    if (shouldLoop) {= 0;
+                    if (shouldLoop) {
                         currentIndex = 0;
-                    } else {Autoplay();
+                    } else {
                         stopAutoplay();
                         return;
                     }
                 }
                 const nextSceneName = sceneNames[currentIndex];
-                const nextSceneName = sceneNames[currentIndex];
                 loadScene(nextSceneName);
                 // Schedule next scene using current scene's transition time
-                // Schedule next scene using current scene's transition time|| 5000;
                 const transitionTime = scenes[nextSceneName].transitionTime || 5000;
                 setTimeout(playNextScene, transitionTime);
             }
             // Initial load if no scene is active
-            // Initial load if no scene is active
-            if (!currentScene) {ceneNames[0];
+            if (!currentScene) {
                 currentScene = sceneNames[0];
                 loadScene(currentScene);
             }
             // Start with current scene's transition time
-            // Start with current scene's transition timecene].transitionTime || 5000;
             const initialTransitionTime = scenes[currentScene].transitionTime || 5000;
             setTimeout(playNextScene, initialTransitionTime);
         }
         function stopAutoplay() {
-        function stopAutoplay() {
-            isPlaying = false;playInterval);
+            isPlaying = false;
             clearInterval(autoplayInterval);
             autoplayInterval = null;
         }
         // Add event listeners
-        // Add event listeners('.autoplay-button').addEventListener('click', toggleAutoplay);
         document.querySelector('.autoplay-button').addEventListener('click', toggleAutoplay);
         // Stop autoplay when manual scene changes are made
-        // Stop autoplay when manual scene changes are made
         const originalLoadScene = loadScene;
-        loadScene = function(sceneName) {rval) {
+        loadScene = function(sceneName) {
             if (isPlaying && autoplayInterval) {
-                stopAutoplay();elector('.autoplay-button').classList.remove('playing');
+                stopAutoplay();
                 document.querySelector('.autoplay-button').classList.remove('playing');
                 document.querySelector('.autoplay-button').textContent = 'Autoplay';
-            }riginalLoadScene(sceneName);
+            }
             originalLoadScene(sceneName);
         };
         // Save autoplay settings to localStorage
-        // Save autoplay settings to localStorage
         function saveAutoplaySettings() {
-            const settings = {ocument.getElementById('loop-autoplay').checked
+            const settings = {
                 loopEnabled: document.getElementById('loop-autoplay').checked
-            };calStorage.setItem('autoplaySettings', JSON.stringify(settings));
+            };
             localStorage.setItem('autoplaySettings', JSON.stringify(settings));
         }
         // Load autoplay settings from localStorage
-        // Load autoplay settings from localStorage
-        function loadAutoplaySettings() {ocalStorage.getItem('autoplaySettings') || '{"loopEnabled": true}');
+        function loadAutoplaySettings() {
             const settings = JSON.parse(localStorage.getItem('autoplaySettings') || '{"loopEnabled": true}');
             document.getElementById('loop-autoplay').checked = settings.loopEnabled;
         }
         // Add event listeners for settings changes
-        // Add event listeners for settings changesdEventListener('change', saveAutoplaySettings);
         document.getElementById('loop-autoplay').addEventListener('change', saveAutoplaySettings);
-        // Load settings when page loads
         // Load settings when page loads
 
         // Remove any legacy event listeners for an "import" button.
