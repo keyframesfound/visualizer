@@ -386,7 +386,7 @@
         .props-panel {
             position: fixed;
             left: 20px;
-            top: 50%;
+            top: 40%;
             transform: translateY(-50%);
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;  /* Increased from 15px */
@@ -466,9 +466,15 @@
         }
 
         .prop-mic-condenser {
-            width: 15px;
+            width: 10px;
             height: 40px;
             background: #1e90ff;  /* Changed to dodger blue */
+            border-radius: 4px;
+        }
+        .prop-music-stand {
+            width: 15px;
+            height: 40px;
+            background: #651eff;  /* Changed to dodger blue */
             border-radius: 4px;
         }
 
@@ -631,7 +637,7 @@
 
         .trash-bin {
             position: fixed;
-            bottom: 73%;  /* Changed from bottom: 20px */
+            bottom: 83%;  /* Changed from bottom: 20px */
             left: 50px;
             width: 50px;
             height: 50px;
@@ -823,14 +829,17 @@
             </div>
             <div class="prop-item" data-prop="mic-condenser" title="Condenser Mic">
                 🎙️
-                <small><Cap></Cap>Condenser</small>
+                <small>Condenser</small>
+            </div>
+            <div class="prop-item" data-prop="music-stand" title="Music Stand">
+                🎵
+                <small>Mus Stand</small>
             </div>
         </div>
     </div>
 
     <div class="trash-bin hidden" id="trashBin">🗑️</div>
 
-    <script src="dragndrop.js"></script>
     <script>
         // Add loading screen handler at the start of your scripts
         window.addEventListener('load', () => {
