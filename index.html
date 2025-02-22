@@ -724,6 +724,27 @@
         .autoplay-button {
             transition: background 0.3s ease, border-color 0.3s ease;
         }
+
+        /* New top right links styling */
+        .top-right-links {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 11000;
+            display: flex;
+            gap: 10px;
+        }
+        .top-right-links a {
+            background: var(--button-bg);
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        .top-right-links a:hover {
+            background: var(--button-hover);
+        }
     
     </style>
     
@@ -733,6 +754,13 @@
 </head>
 <body>
     <div class="credits">Developed By Ryan Yeung - Head of Stage Management Team 24-25</div>
+    
+    <!-- New top right links -->
+    <div class="top-right-links">
+        <a href="documentation.html">Documentation</a>
+        <a href="about.html">About</a>
+        <a href="licenses.html">Licenses</a>
+    </div>
     
     <!-- loading screen -->
     <div class="loading-screen">
@@ -1650,6 +1678,15 @@
                 localStorage.setItem('scenes', JSON.stringify(scenes));
                 updateScenesList();
             }
+        });
+
+        // Add popup functionality for top-right links
+        document.querySelectorAll('.top-right-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Open the link in a popup window
+                window.open(this.href, '_blank', 'width=800,height=600,resizable=yes');
+            });
         });
     </script>
 </body>
