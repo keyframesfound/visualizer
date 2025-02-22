@@ -706,6 +706,24 @@
         #clearAllScenesButton {
             min-width: 80px;
         }
+
+        /* Added focus styles for interactive elements */
+        .control-panel-button:focus,
+        .export-pdf-button:focus,
+        .scene-button:focus,
+        .import-button:focus,
+        .autoplay-button:focus {
+            outline: 2px solid var(--accent-color);
+        }
+
+        /* Optional: smooth transition for button backgrounds on hover */
+        .control-panel-button,
+        .export-pdf-button,
+        .scene-button,
+        .import-button,
+        .autoplay-button {
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
     
     </style>
     
@@ -723,7 +741,7 @@
     </div>
 
     <!-- Wrap existing content in main-content div -->
-    <div class="main-content">
+    <main class="main-content" role="main">
         <div class="stage-container">
             <div class="stage-floor">
                 <div class="stage-monitor" id="monitor-left"></div>
@@ -745,11 +763,11 @@
 
             <div class="audience-label">Audience</div>
         </div>
-        <button class="control-panel-button">Control Panel</button>
+        <button class="control-panel-button" aria-label="Toggle Control Panel">Control Panel</button>
         <div class="control-panel">
             <div class="scene-manager">
                 <div class="control-buttons">
-                    <button class="export-pdf-button">Export Layout PDF</button>
+                    <button class="export-pdf-button" aria-label="Export Stage Layout as PDF">Export Layout PDF</button>
                     <!-- Removed Export Lighting button from here -->
                     <!-- Add autoplay controls -->
                     <div class="autoplay-controls">
@@ -847,7 +865,7 @@
 
             </div>
         </div>
-    </div>
+    </main>
 
     <div class="trash-bin hidden" id="trashBin">🗑️</div>
 
@@ -1209,11 +1227,37 @@
             element.addEventListener('touchstart', handleTouchStart);
             document.addEventListener('touchmove', handleTouchMove);
             document.addEventListener('touchend', handleTouchEnd);
+            
+            function startDragging(e) {
+                initialX = e.clientX - element.offsetLeft;
+                initialY = e.clientY - element.offsetTop;
+                isDragging = true;
+                document.body.style.userSelect = "none";  // Disable text selection
+                handleDragStart();
+            }
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    element.style.left = `${currentX}px`;
+                    element.style.top = `${currentY}px`;
+                    handleDrag(e.clientX, e.clientY);
+                }
+            }
+            function stopDragging(e) {
+                if (isDragging) {
+                    handleDragEnd(e.clientX, e.clientY);
+                }
+                isDragging = false;
+                document.body.style.userSelect = "";  // Restore selection
+            }
             function handleTouchStart(e) {
                 const touch = e.touches[0];
                 initialX = touch.clientX - element.offsetLeft;
                 initialY = touch.clientY - element.offsetTop;
                 isDragging = true;
+                document.body.style.userSelect = "none";  // Disable text selection
                 handleDragStart();
             }
             function handleTouchMove(e) {
@@ -1233,28 +1277,7 @@
                     handleDragEnd(touch.clientX, touch.clientY);
                 }
                 isDragging = false;
-            }
-            function startDragging(e) {
-                initialX = e.clientX - element.offsetLeft;
-                initialY = e.clientY - element.offsetTop;
-                isDragging = true;
-                handleDragStart();
-            }
-            function drag(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                    element.style.left = `${currentX}px`;
-                    element.style.top = `${currentY}px`;
-                    handleDrag(e.clientX, e.clientY);
-                }
-            }
-            function stopDragging(e) {
-                if (isDragging) {
-                    handleDragEnd(e.clientX, e.clientY);
-                }
-                isDragging = false;
+                document.body.style.userSelect = "";  // Restore selection
             }
             const trashBin = document.getElementById('trashBin');
             function showTrashBin() {
