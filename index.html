@@ -1093,7 +1093,7 @@
                 return;
             }
             const baseName = sceneName;
-            let newName = `${baseName} (copy)`;
+            let newName = `${baseName} 1`;
             let counter = 1;
             while (scenes[newName]) {
                 counter++;
@@ -1108,6 +1108,10 @@
             if (!sceneName) return;
             const newName = prompt('Enter new scene name:', sceneName);
             if (!newName || newName === sceneName) return;
+            if (newName.length > 7) { // Added rename scene name check
+                alert('Scene name must be 7 characters or less');
+                return;
+            }
             if (scenes[newName]) {
                 alert('A scene with this name already exists');
                 return;
@@ -1157,6 +1161,10 @@
         function createScene() {
             const sceneName = prompt('Enter scene name:');
             if (!sceneName) return;
+            if (sceneName.length > 7) { // Added scene name length check
+                alert('Scene name must be 7 characters or less');
+                return;
+            }
             if (scenes[sceneName]) {
                 alert('A scene with this name already exists');
                 return;
