@@ -533,10 +533,21 @@
             .stage-container {
                 width: 95vw;
                 height: 65vh;
+                margin-top: -40vh;
             }
 
             .props-panel {
                 padding: 15px;
+            }
+
+            .slider-container {
+                width: 70px;
+                height: 170px;
+            }
+
+            .control-panel {
+                grid-template-columns: 350px 1fr;
+                height: 380px;
             }
         }
 
@@ -744,6 +755,34 @@
         }
         .top-right-links a:hover {
             background: var(--button-hover);
+        }
+
+        /* New media query for laptops (min-width: 1025px) */
+        @media (min-width: 1025px) {
+            /* Adjust stage container for larger screens */
+            .stage-container {
+                width: 80vw;
+                height: 70vh;
+                margin-top: -35vh;
+            }
+            /* Refine control panel layout */
+            .control-panel {
+                grid-template-columns: 400px 1fr;
+                height: 350px;
+            }
+            /* Enhance slider sizes */
+            .slider-container {
+                width: 80px;
+                height: 200px;
+            }
+            /* Adjust scene list container height */
+            .scene-list-container {
+                height: calc(100% - 80px);
+            }
+            /* Slightly increase font sizes for readability */
+            .scene-name, .scene-transition {
+                font-size: 1.2em;
+            }
         }
     
     </style>
